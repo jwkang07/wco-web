@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>우리챔버오케스트라 · 디자인 디렉션 (통합본)</title>
+  <style>
+    :root {
+      --orange: #E85A24;
+      --grey: #262626;
+      --peach: #FBE8E6;
+      --white: #FFFFFF;
+      --border: rgba(38, 38, 38, 0.12);
+      --muted: rgba(38, 38, 38, 0.68);
+      --bench-dark: #1A2433;
+      --bench-gold: #C8943A;
+      --bench-blue: #2E6DB4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @page { margin: 18mm 16mm; size: A4; }
+
+    body {
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      color: var(--grey);
+      background: white;
+      line-height: 1.6;
+      font-size: 10.5pt;
+    }
+
+    .doc { max-width: 210mm; margin: 0 auto; }
+
+    .cover {
+      background: var(--grey);
+      color: white;
+      padding: 36px 32px 32px;
+      border-bottom: 4px solid var(--orange);
+      page-break-after: always;
+    }
+
+    .cover h1 { font-size: 22pt; margin-bottom: 6px; }
+    .cover .sub { font-size: 11pt; opacity: 0.85; margin-bottom: 16px; }
+    .cover .meta { font-size: 9pt; opacity: 0.7; }
+
+    .part-cover {
+      background: var(--peach);
+      padding: 28px 32px;
+      border-left: 6px solid var(--orange);
+      margin-bottom: 24px;
+      page-break-before: always;
+    }
+
+    .part-cover.bench {
+      background: #EEF2F7;
+      border-left-color: var(--bench-dark);
+    }
+
+    .part-cover h2 { font-size: 16pt; margin-bottom: 4px; }
+    .part-cover p { font-size: 10pt; color: var(--muted); }
+
+    .content { padding: 0 32px 32px; }
+
+    section { margin-bottom: 28px; page-break-inside: avoid; }
+
+    h3 {
+      font-size: 12pt;
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid var(--peach);
+    }
+
+    h4 { font-size: 10.5pt; margin: 12px 0 6px; }
+
+    p { margin-bottom: 8px; color: var(--muted); font-size: 10pt; }
+    p strong { color: var(--grey); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+      margin-bottom: 10px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 7px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--peach); font-weight: 700; }
+    .bench th { background: #E8EDF3; }
+
+    tr:nth-child(even) td { background: #fafafa; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+    .box {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .box-title { font-weight: 700; font-size: 10pt; margin-bottom: 4px; }
+
+    .note {
+      background: var(--peach);
+      border-left: 4px solid var(--orange);
+      padding: 10px 12px;
+      font-size: 9.5pt;
+      margin: 10px 0;
+    }
+
+    .note.bench {
+      background: #EEF2F7;
+      border-left-color: var(--bench-dark);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--orange);
+      color: white;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .badge.bench { background: var(--bench-dark); }
+
+    .swatch {
+      height: 32px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+
+    .swatch-label { font-size: 8.5pt; font-weight: 700; }
+    .swatch-hex { font-size: 8pt; color: var(--muted); }
+
+    .ci-img {
+      width: 100%;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+
+    .mock {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      font-size: 8pt;
+      margin-bottom: 6px;
+    }
+
+    .mock-bar { padding: 6px 8px; border-bottom: 2px solid var(--orange); }
+    .mock-hero { padding: 14px 8px; min-height: 56px; }
+    .mock-btn {
+      display: inline-block;
+      background: var(--orange);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 8.5pt;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .compare-table td:first-child { font-weight: 600; white-space: nowrap; }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .part-cover { page-break-before: always; }
+    }
+  </style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- 표지 -->
+  <header class="cover">
+    <p class="sub">은평구립우리장애인복지관 · 우리챔버오케스트라</p>
+    <h1>디자인 디렉션<br>통합 검토본</h1>
+    <p class="sub">Woori Chamber Orchestra — Design Direction v0.2</p>
+    <p class="meta">2026-08-28 · 검토·공유용 · PDF 출력 최적화</p>
+    <p class="meta" style="margin-top:12px">
+      Ⅰ부: 복지관 CI 연계 안 &nbsp;|&nbsp; Ⅱ부: 벤치마크 기준 독립 안
+    </p>
+  </header>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- Ⅰ부: 복지관 CI 연계 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="part-cover">
+    <h2>Ⅰ부. 복지관 CI 연계 디자인 안</h2>
+    <p>은평구립우리장애인복지관 CI·톤앤매너를 기준으로 한 방향. 복지관 홈페이지에서 링크로 연결될 때 이질감이 적도록 설계.</p>
+  </div>
+
+  <div class="content">
+    <section>
+      <h3>1. 프로젝트 개요</h3>
+      <table>
+        <tr><th style="width:26%">항목</th><th>내용</th></tr>
+        <tr><td>단체명</td><td>우리챔버오케스트라 (Woori Chamber Orchestra)</td></tr>
+        <tr><td>소속</td><td>은평구립우리장애인복지관 · 문화연계형 복지일자리</td></tr>
+        <tr><td>사이트 형태</td><td>독립 홈페이지 (복지관 사이트 링크 연결)</td></tr>
+        <tr><td>1차 목적</td><td><strong>소개</strong></td></tr>
+        <tr><td>1차 메뉴</td><td>홈 · 소개 · 단원 · 문의</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h3>2. 복지관 CI 색상 (공식)</h3>
+      <div class="grid-2">
+        <div>
+          <img class="ci-img" src="assets/goodwoori-ci.png" alt="CI">
+          <p style="font-size:8.5pt">심볼: 오렌지 두 점 + 그레이 곡선 (「오」「우」)</p>
+        </div>
+        <div class="grid-2">
+          <div>
+            <div class="swatch" style="background:#E85A24"></div>
+            <div class="swatch-label">오렌지</div>
+            <div class="swatch-hex">#E85A24 · CMYK 0,77,100,0</div>
+          </div>
+          <div>
+            <div class="swatch" style="background:#262626"></div>
+            <div class="swatch-label">다크 그레이</div>
+            <div class="swatch-hex">#262626 · CMYK 0,0,0,85</div>
+          </div>
+          <div>
+            <div class="swatch" style="background:#FBE8E6"></div>
+            <div class="swatch-label">피치</div>
+            <div class="swatch-hex">#FBE8E6</div>
+          </div>
+          <div>
+            <div class="swatch" style="background:#FFF;border:1px solid #ddd"></div>
+            <div class="swatch-label">화이트</div>
+            <div class="swatch-hex">#FFFFFF</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3>3. Ⅰ부 색감 3안</h3>
+      <p>공통: CI 오렌지·그레이·피치 사용. 블루·베이지 톤 사용 안 함.</p>
+      <table class="compare-table">
+        <tr>
+          <th>안</th><th>특징</th><th>복지관 연속성</th><th>오케스트라 품위</th><th>추천</th>
+        </tr>
+        <tr>
+          <td>A. CI 동행 라이트</td>
+          <td>피치 배경 + 오렌지 버튼. 복지관 사이트와 가장 자연스러움</td>
+          <td>매우 높음</td><td>보통</td><td></td>
+        </tr>
+        <tr>
+          <td>B. 무대와 동행</td>
+          <td>히어로만 다크 그레이, 본문은 CI 톤. 공연 사진 투입 유연</td>
+          <td>높음</td><td>높음</td>
+          <td><span class="badge">추천</span></td>
+        </tr>
+        <tr>
+          <td>C. 무대 다크</td>
+          <td>전면 다크 + 오렌지 포인트. 품위 강하나 복지관과 다소 독립적</td>
+          <td>보통</td><td>매우 높음</td><td></td>
+        </tr>
+      </table>
+      <div class="note"><strong>Ⅰ부 1차 추천: B안</strong> — 복지관 CI를 유지하면서 공연 사진이 준비되면 히어로에 자연스럽게 반영 가능.</div>
+    </section>
+
+    <section>
+      <h3>4. Ⅰ부 카피 톤</h3>
+      <table>
+        <tr><th>지양</th><th>권장</th></tr>
+        <tr><td>불우한 장애인을 돕습니다</td><td>음악으로 지역사회와 소통합니다</td></tr>
+        <tr><td>특별한 아이들의 꿈</td><td>발달장애 예술가로 성장하는 연주자들</td></tr>
+        <tr><td>따뜻한 마음을 나눠주세요</td><td>우리의 무대를 함께 응원해 주세요</td></tr>
+      </table>
+      <p><strong>미션 초안:</strong> 「음악으로 세상과 만나는, 우리챔버오케스트라」</p>
+    </section>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- Ⅱ부: 벤치마크 기준 독립 안 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="part-cover bench">
+    <h2>Ⅱ부. 벤치마크 기준 독립 디자인 안</h2>
+    <p>복지관 홈페이지 톤과 무관하게, 국내 발달장애인 오케스트라·연주단체 벤치마크만을 기준으로 한 방향. 전문 연주 단체로서의 품위·구조를 우선.</p>
+  </div>
+
+  <div class="content">
+    <section>
+      <h3>5. 벤치마크 사이트 분석</h3>
+      <table class="bench compare-table">
+        <tr><th>사이트</th><th>유형</th><th>가져올 점</th><th>가져오지 않을 점</th></tr>
+        <tr>
+          <td>하트하트오케스트라</td><td>최근접 모델</td>
+          <td>소개·단원·공연·소식 IA, 연주자 중심 톤</td>
+          <td>재단·아카데미·콩쿨까지 한 사이트 규모</td>
+        </tr>
+        <tr>
+          <td>드림위드앙상블</td><td>실무형 연주단체</td>
+          <td>월별 공연 일정, 영상 아카이브, 후원 안내</td>
+          <td>게시판형 오래된 UI</td>
+        </tr>
+        <tr>
+          <td>아트위캔</td><td>현대적 단체</td>
+          <td>히어로 영상, 최근 공연 카드, 앙상블 소개</td>
+          <td>교육·카페·일자리까지 한 번에</td>
+        </tr>
+        <tr>
+          <td>뷰티플마인드</td><td>신뢰 구축</td>
+          <td>인사말, 숫자 연혁, 소식지·보도</td>
+          <td>외교·해외 네트워크 중심 포지션</td>
+        </tr>
+        <tr>
+          <td>경기리베라오케스트라</td><td>단원 프로필</td>
+          <td>악기·약력·한 줄 소개 단원 카드</td>
+          <td>공연장 산하 페이지 톤</td>
+        </tr>
+        <tr>
+          <td>하트하트아트앤컬처</td><td>브랜드 톤</td>
+          <td>사진·여백, 아티스트 동등 대우</td>
+          <td>미술·굿즈 복합 브랜드</td>
+        </tr>
+        <tr>
+          <td>신한 SOL레미오</td><td>스토리 참고</td>
+          <td>직업 연주자·고용 모델 내러티브</td>
+          <td>기업 인트라넷 구조</td>
+        </tr>
+      </table>
+      <div class="note bench">
+        <strong>Ⅱ부 핵심:</strong> 「복지 기관 소개」가 아니라 「전문 연주 단체 + 자립 + 인식 개선」을 동시에 보여주는 사이트.
+      </div>
+    </section>
+
+    <section>
+      <h3>6. Ⅱ부 공통 설계 원칙</h3>
+      <div class="grid-2">
+        <div class="box">
+          <div class="box-title">메시지</div>
+          <p style="margin:0;font-size:9pt;color:var(--muted)">단원은 학습자가 아니라 연주자. 공연은 사회공헌 이벤트가 아니라 본업. 동정이 아닌 품위.</p>
+        </div>
+        <div class="box">
+          <div class="box-title">구조 (벤치마크 공통 5모듈)</div>
+          <p style="margin:0;font-size:9pt;color:var(--muted)">소개 · 사람과 악기 · 공연 · 소식 · 함께하기(문의)</p>
+        </div>
+        <div class="box">
+          <div class="box-title">시각</div>
+          <p style="margin:0;font-size:9pt;color:var(--muted)">공연 사진이 주인공. 여백 넉넉. 카드 2~3열. 과한 장식·자동재생 지양.</p>
+        </div>
+        <div class="box">
+          <div class="box-title">접근성</div>
+          <p style="margin:0;font-size:9pt;color:var(--muted)">WCAG 2.2 AA. 충분한 대비, 대체 텍스트, 키보드 탐색, 자막.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3>7. Ⅱ부 색감 3안 (벤치마크 기준)</h3>
+      <p>복지관 CI 색상과 무관. 벤치마크 사이트 톤에서 추출한 독립 팔레트.</p>
+      <table class="bench compare-table">
+        <tr>
+          <th>안</th><th>레퍼런스</th><th>색감</th><th>특징</th><th>추천</th>
+        </tr>
+        <tr>
+          <td>D. 무대 품위</td>
+          <td>하트하트·아트위캔</td>
+          <td>다크 네이비 #1A2433 + 골드 #C8943A</td>
+          <td>무대 중심, 품위 최대. 사진·영상 히어로</td>
+          <td><span class="badge bench">추천</span></td>
+        </tr>
+        <tr>
+          <td>E. 현대 라이트</td>
+          <td>아트위캔·뷰티플마인드</td>
+          <td>화이트 + 딥 블루 #2E6DB4 + 웜 그레이</td>
+          <td>밝고 현대적. 카드형 공연 목록에 적합</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>F. 아카이브</td>
+          <td>드림위드·경기리베라</td>
+          <td>오프화이트 #F7F6F3 + 차콜 + 테라코타</td>
+          <td>실용적. 일정·단원 카드·보도 아카이브 중심</td>
+          <td></td>
+        </tr>
+      </table>
+
+      <h4>Ⅱ부 팔레트 비교</h4>
+      <div class="grid-3">
+        <div>
+          <p style="font-weight:700;font-size:9pt;margin-bottom:6px">D. 무대 품위</p>
+          <div class="swatch" style="background:#1A2433"></div><div class="swatch-hex">네이비 #1A2433</div>
+          <div class="swatch" style="background:#C8943A;margin-top:4px"></div><div class="swatch-hex">골드 #C8943A</div>
+          <div class="swatch" style="background:#F2F2F2;margin-top:4px"></div><div class="swatch-hex">라이트 #F2F2F2</div>
+        </div>
+        <div>
+          <p style="font-weight:700;font-size:9pt;margin-bottom:6px">E. 현대 라이트</p>
+          <div class="swatch" style="background:#2E6DB4"></div><div class="swatch-hex">블루 #2E6DB4</div>
+          <div class="swatch" style="background:#FFFFFF;border:1px solid #ddd"></div><div class="swatch-hex">화이트 #FFFFFF</div>
+          <div class="swatch" style="background:#5A5A5A;margin-top:4px"></div><div class="swatch-hex">그레이 #5A5A5A</div>
+        </div>
+        <div>
+          <p style="font-weight:700;font-size:9pt;margin-bottom:6px">F. 아카이브</p>
+          <div class="swatch" style="background:#F7F6F3;border:1px solid #ddd"></div><div class="swatch-hex">오프화이트 #F7F6F3</div>
+          <div class="swatch" style="background:#3D3D3D;margin-top:4px"></div><div class="swatch-hex">차콜 #3D3D3D</div>
+          <div class="swatch" style="background:#C4622D;margin-top:4px"></div><div class="swatch-hex">테라코타 #C4622D</div>
+        </div>
+      </div>
+      <div class="note bench"><strong>Ⅱ부 1차 추천: D안 (무대 품위)</strong> — 하트하트오케스트라에 가장 가깝고, 공연 사진·영상 투입 시 가장 자연스러움.</div>
+    </section>
+
+    <section>
+      <h3>8. Ⅱ부 정보구조 (벤치마크 기준)</h3>
+      <table class="bench">
+        <tr><th>메뉴</th><th>벤치마크 근거</th><th>1차</th></tr>
+        <tr><td>홈</td><td>하트하트·아트위캔 히어로</td><td>공연 사진/영상, 미션, 다음 공연, 하이라이트</td></tr>
+        <tr><td>소개</td><td>뷰티플마인드 인사말</td><td>오케스트라란, 복지일자리 모델, 연혁, 지휘</td></tr>
+        <tr><td>단원</td><td>경기리베라 단원 카드</td><td>악기군별 카드 (사진·한 줄 소개)</td></tr>
+        <tr><td>공연</td><td>드림위드 일정·정기연주회</td><td>예정 + 지난 무대 아카이브</td></tr>
+        <tr><td>소식</td><td>하트하트 공지·보도</td><td>공지·언론보도·영상 링크</td></tr>
+        <tr><td>문의</td><td>공통</td><td>초청·취재·협력 문의</td></tr>
+      </table>
+      <p>소개 목적 1차 론칭 시: 홈·소개·단원·문의 4개만. 공연·소식은 2차.</p>
+    </section>
+
+    <section>
+      <h3>9. Ⅰ부 vs Ⅱ부 비교</h3>
+      <table class="compare-table">
+        <tr><th></th><th>Ⅰ부 (복지관 CI 연계)</th><th>Ⅱ부 (벤치마크 독립)</th></tr>
+        <tr><td>색상 기준</td><td>복지관 CI (오렌지·그레이·피치)</td><td>벤치마크 톤 (네이비·골드 등)</td></tr>
+        <tr><td>복지관 연속성</td><td>매우 중요 (링크 이질감 최소화)</td><td>상·하단 소속 표기로 보완</td></tr>
+        <tr><td>오케스트라 품위</td><td>보통~높음</td><td>높음~매우 높음</td></tr>
+        <tr><td>1차 추천</td><td><strong>B. 무대와 동행</strong></td><td><strong>D. 무대 품위</strong></td></tr>
+        <tr><td>적합 상황</td><td>복지관 담당자·내부 검토</td><td>오케스트라 정체성·대외 홍보 강조</td></tr>
+      </table>
+      <div class="note">
+        <strong>실무 제안:</strong> 복지관 링크 사이트이므로 <strong>Ⅰ부 B안을 기본</strong>으로 하되, 히어로·단원·공연 영역의 레이아웃·카피 톤은 <strong>Ⅱ부 벤치마크 원칙</strong>을 따르는 하이브리드가 가장 현실적입니다.
+      </div>
+    </section>
+
+    <section>
+      <h3>10. 의견 요청</h3>
+      <table>
+        <tr><th style="width:5%">#</th><th>질문</th><th>선택지</th></tr>
+        <tr><td>1</td><td>색감 (Ⅰ부)</td><td>A / <strong>B 추천</strong> / C</td></tr>
+        <tr><td>2</td><td>색감 (Ⅱ부 참고)</td><td>D 추천 / E / F</td></tr>
+        <tr><td>3</td><td>적용 방식</td><td>Ⅰ부만 / Ⅱ부만 / 하이브리드(Ⅰ 색상 + Ⅱ 구조)</td></tr>
+        <tr><td>4</td><td>히어로 문장</td><td>초안 수정 또는 새 문장</td></tr>
+        <tr><td>5</td><td>공연 사진</td><td>있음 / 추후 제공</td></tr>
+      </table>
+    </section>
+
+    <footer class="footer">
+      우리챔버오케스트라 홈페이지 · 디자인 디렉션 통합본 v0.2 · 2026-08-28<br>
+      은평구립우리장애인복지관 소속 · goodwoori.or.kr
+    </footer>
+  </div>
+</div>
+</body>
+</html>

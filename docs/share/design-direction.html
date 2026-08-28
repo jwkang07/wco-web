@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리챔버오케스트라 · 디자인 디렉션</title>
+  <style>
+    :root {
+      --orange: #E85A24;
+      --grey: #262626;
+      --peach: #FBE8E6;
+      --white: #FFFFFF;
+      --border: rgba(38, 38, 38, 0.1);
+      --muted: rgba(38, 38, 38, 0.65);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: var(--grey);
+      background: #f5f5f5;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--white);
+      box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+    }
+
+    .cover {
+      background: var(--grey);
+      color: var(--white);
+      padding: 48px 40px 40px;
+      border-bottom: 4px solid var(--orange);
+    }
+
+    .cover .org {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-bottom: 12px;
+    }
+
+    .cover h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .cover .en {
+      font-size: 15px;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+
+    .cover .meta {
+      font-size: 13px;
+      opacity: 0.65;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--orange);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    .content { padding: 40px; }
+
+    section { margin-bottom: 48px; }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--peach);
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p { margin-bottom: 12px; color: var(--muted); }
+    p strong { color: var(--grey); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 12px 16px;
+      background: var(--peach);
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-body { padding: 16px; }
+
+    .recommended {
+      background: var(--orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .swatch {
+      border-radius: 8px;
+      height: 48px;
+      margin-bottom: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .swatch-label { font-size: 12px; font-weight: 600; }
+    .swatch-hex { font-size: 11px; color: var(--muted); }
+    .swatch-cmyk { font-size: 11px; color: var(--muted); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--peach);
+      font-weight: 600;
+      color: var(--grey);
+    }
+
+    tr:nth-child(even) td { background: #fafafa; }
+
+    .ci-img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    /* Mockup screens */
+    .mock {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+
+    .mock-header {
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--orange);
+    }
+
+    .mock-header.dark { background: var(--grey); color: white; }
+    .mock-header.light { background: white; color: var(--grey); }
+
+    .mock-nav {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .mock-sub { font-size: 10px; opacity: 0.7; margin-top: 4px; }
+
+    .mock-hero {
+      padding: 20px 12px;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .mock-hero h4 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .mock-hero p { font-size: 10px; margin-bottom: 8px; opacity: 0.85; }
+
+    .mock-btn {
+      display: inline-block;
+      background: var(--orange);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 14px;
+      font-size: 10px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .mock-body { padding: 12px; }
+    .mock-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .mock-card {
+      height: 40px;
+      border-radius: 6px;
+      background: var(--peach);
+    }
+
+    .hero-a { background: var(--peach); color: var(--grey); }
+    .hero-b { background: var(--grey); color: white; }
+    .hero-c { background: #1A1A1A; color: white; }
+
+    .body-c .mock-card { background: #2A2A2A; }
+    .body-c { background: #1A1A1A; color: #f5f5f5; }
+
+    .note {
+      background: var(--peach);
+      border-left: 4px solid var(--orange);
+      padding: 14px 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      color: var(--grey);
+      margin-bottom: 16px;
+    }
+
+    .note.success { background: #f0faf4; border-color: #2d9f5f; }
+
+    .footer {
+      padding: 24px 40px;
+      background: var(--peach);
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 720px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .cover, .content { padding: 24px; }
+    }
+
+    @media print {
+      body { background: white; }
+      .page { box-shadow: none; }
+      section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="cover">
+      <p class="org">은평구립우리장애인복지관 · 문화연계형 복지일자리 프로그램</p>
+      <h1>우리챔버오케스트라<br>디자인 디렉션</h1>
+      <p class="en">Woori Chamber Orchestra — Design Direction v0.1</p>
+      <div>
+        <span class="badge">소개 목적</span>
+        <span class="badge">복지관 CI 준수</span>
+        <span class="badge">2026-08-28</span>
+      </div>
+      <p class="meta" style="margin-top:16px">홈페이지 기획 · 톤앤매너 · 색상 방향 공유용 문서</p>
+    </header>
+
+    <main class="content">
+
+      <section>
+        <h2>1. 프로젝트 개요</h2>
+        <table>
+          <tr><th style="width:28%">항목</th><th>내용</th></tr>
+          <tr><td>단체명</td><td>우리챔버오케스트라 (Woori Chamber Orchestra)</td></tr>
+          <tr><td>소속</td><td>은평구립우리장애인복지관 프로그램</td></tr>
+          <tr><td>사이트 형태</td><td>독립 홈페이지 (복지관 사이트에서 링크 연결)</td></tr>
+          <tr><td>1차 목적</td><td><strong>소개</strong> — 오케스트라란 무엇인지, 누가 연주하는지</td></tr>
+          <tr><td>운영</td><td>오케스트라 운영담당자</td></tr>
+          <tr><td>1차 메뉴</td><td>홈 · 소개 · 단원 · 문의 (공연·소식은 2차)</td></tr>
+        </table>
+      </section>
+
+      <section>
+        <h2>2. 디자인 원칙</h2>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">지켜야 할 것</div>
+            <div class="card-body">
+              <p>복지관 CI 색상·톤 유지 (오렌지 + 그레이 + 피치)</p>
+              <p>슬로건 「꿈을 향한 행복한 동행」과 어울리는 따뜻하지만 가볍지 않은 톤</p>
+              <p>복지관 로고·소속 표기 필수</p>
+              <p>접근성 고려 (가독성, 대비, 키보드 탐색)</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">오케스트라만 더할 것</div>
+            <div class="card-body">
+              <p>공연 사진·히어로의 무대감</p>
+              <p>단원을 <strong>연주자</strong>로 보여주는 카드</p>
+              <p>짧고 담담한 카피 (동정 유발 표현 지양)</p>
+              <p>나무말미식 출판/베이지 톤 사용 안 함</p>
+            </div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:16px">
+          <strong>핵심 메시지:</strong> 복지관 프로그램이지만, 동정의 대상이 아니라 무대에 서는 연주자들의 오케스트라입니다.
+        </div>
+      </section>
+
+      <section>
+        <h2>3. 복지관 CI (공식 색상)</h2>
+        <p>은평구립우리장애인복지관 CI 페이지 및 제공 CI 파일 기준</p>
+        <div class="grid-2" style="margin-bottom:20px">
+          <div>
+            <img class="ci-img" src="assets/goodwoori-ci.png" alt="복지관 CI 가이드">
+            <p style="font-size:12px">CI 가이드 — 심볼: 오렌지 두 점 + 그레이 곡선 (「오」「우」, 함께 나아감)</p>
+          </div>
+          <div>
+            <img class="ci-img" src="assets/goodwoori-characters.png" alt="복지관 캐릭터">
+            <p style="font-size:12px">캐릭터 (우리람이·오우맨) — 본문 과다 사용 지양, 푸터 등 선택적</p>
+          </div>
+        </div>
+        <div class="grid-4">
+          <div>
+            <div class="swatch" style="background:#E85A24"></div>
+            <div class="swatch-label">오렌지 (포인트)</div>
+            <div class="swatch-hex">#E85A24</div>
+            <div class="swatch-cmyk">CMYK 0, 77, 100, 0</div>
+          </div>
+          <div>
+            <div class="swatch" style="background:#262626"></div>
+            <div class="swatch-label">다크 그레이 (텍스트)</div>
+            <div class="swatch-hex">#262626</div>
+            <div class="swatch-cmyk">CMYK 0, 0, 0, 85</div>
+          </div>
+          <div>
+            <div class="swatch" style="background:#FBE8E6"></div>
+            <div class="swatch-label">피치 (섹션 배경)</div>
+            <div class="swatch-hex">#FBE8E6</div>
+          </div>
+          <div>
+            <div class="swatch" style="background:#FFFFFF; border:1px solid #ddd"></div>
+            <div class="swatch-label">화이트 (기본 배경)</div>
+            <div class="swatch-hex">#FFFFFF</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>4. 색감 방향 3안 비교</h2>
+        <p>3안 모두 CI 오렌지·그레이를 공통으로 사용합니다. 차이는 배경 밝기와 히어로(상단 영역) 무대감입니다.</p>
+
+        <div class="grid-3" style="margin-top:20px">
+
+          <!-- A -->
+          <div>
+            <div class="mock">
+              <div class="mock-header light">
+                <div class="mock-nav"><span>WCO</span><span>소개·단원·문의</span></div>
+                <div class="mock-sub">은평구립우리장애인복지관 소속</div>
+              </div>
+              <div class="mock-hero hero-a">
+                <h4>음악으로 세상과 만나는<br>우리챔버오케스트라</h4>
+                <p>문화연계형 복지일자리 프로그램</p>
+                <span class="mock-btn">오케스트라 소개</span>
+              </div>
+              <div class="mock-body">
+                <div style="font-weight:600;margin-bottom:6px;font-size:11px">최근 공연</div>
+                <div class="mock-cards"><div class="mock-card"></div><div class="mock-card"></div></div>
+              </div>
+            </div>
+            <div style="margin-top:10px">
+              <h3>A. CI 동행 라이트</h3>
+              <p>복지관 사이트와 가장 자연스럽게 이어짐. 피치 배경 + 오렌지 버튼.</p>
+              <p><strong>복지관 연속성:</strong> 매우 높음 &nbsp;|&nbsp; <strong>오케스트라 품위:</strong> 보통</p>
+            </div>
+          </div>
+
+          <!-- B -->
+          <div>
+            <div class="mock">
+              <div class="mock-header light">
+                <div class="mock-nav"><span>WCO</span><span>소개·단원·문의</span></div>
+                <div class="mock-sub">은평구립우리장애인복지관 소속</div>
+              </div>
+              <div class="mock-hero hero-b">
+                <h4>별이 된 꿈,<br>세상을 물들이다</h4>
+                <p>공연 사진 + 오렌지 포인트</p>
+                <span class="mock-btn">오케스트라 소개</span>
+              </div>
+              <div class="mock-body">
+                <div style="font-weight:600;margin-bottom:6px;font-size:11px">최근 공연</div>
+                <div class="mock-cards"><div class="mock-card"></div><div class="mock-card"></div></div>
+              </div>
+            </div>
+            <div style="margin-top:10px">
+              <h3>B. 무대와 동행 <span class="recommended">추천</span></h3>
+              <p>히어로만 다크 그레이, 본문은 CI 톤. 공연 사진 투입 + 소개 목적에 가장 유연.</p>
+              <p><strong>복지관 연속성:</strong> 높음 &nbsp;|&nbsp; <strong>오케스트라 품위:</strong> 높음</p>
+            </div>
+          </div>
+
+          <!-- C -->
+          <div>
+            <div class="mock">
+              <div class="mock-header dark">
+                <div class="mock-nav"><span>WCO</span><span>소개·단원·문의</span></div>
+                <div class="mock-sub">은평구립우리장애인복지관 소속</div>
+              </div>
+              <div class="mock-hero hero-c">
+                <h4>음악으로 전하는 이야기</h4>
+                <p>어두운 무대 + 오렌지 포인트</p>
+                <span class="mock-btn">오케스트라 소개</span>
+              </div>
+              <div class="mock-body body-c">
+                <div style="font-weight:600;margin-bottom:6px;font-size:11px">최근 공연</div>
+                <div class="mock-cards"><div class="mock-card"></div><div class="mock-card"></div></div>
+              </div>
+            </div>
+            <div style="margin-top:10px">
+              <h3>C. 무대 다크</h3>
+              <p>오케스트라 품위 최대. 복지관 연속성은 상단 오렌지 라인·로고로 보완.</p>
+              <p><strong>복지관 연속성:</strong> 보통 &nbsp;|&nbsp; <strong>오케스트라 품위:</strong> 매우 높음</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="note success" style="margin-top:20px">
+          <strong>1차 추천: B안 (무대와 동행)</strong> — 복지관 CI 톤을 유지하면서, 공연 사진이 준비되면 히어로에 자연스럽게 넣을 수 있습니다.
+        </div>
+      </section>
+
+      <section>
+        <h2>5. 카피 톤 가이드</h2>
+        <table>
+          <tr><th>쓰지 않을 표현</th><th>쓸 표현</th></tr>
+          <tr><td>불우한 장애인을 돕습니다</td><td>음악으로 지역사회와 소통합니다</td></tr>
+          <tr><td>특별한 아이들의 꿈</td><td>발달장애 예술가로 성장하는 연주자들</td></tr>
+          <tr><td>따뜻한 마음을 나눠주세요</td><td>우리의 무대를 함께 응원해 주세요</td></tr>
+        </table>
+        <p style="margin-top:12px"><strong>미션 문장 초안:</strong> 「음악으로 세상과 만나는, 우리챔버오케스트라」</p>
+      </section>
+
+      <section>
+        <h2>6. 사진·로고 (현재 상태)</h2>
+        <table>
+          <tr><th>자료</th><th>상태</th><th>비고</th></tr>
+          <tr><td>복지관 CI</td><td>확보</td><td>woori_CI.ai, 색상 코드 확정</td></tr>
+          <tr><td>공연 사진</td><td>추후 확보</td><td>보도자료·SNS·단체 앨범에서 수집 예정</td></tr>
+          <tr><td>오케스트라 전용 로고</td><td>미정</td><td>1차는 복지관 로고 + 프로그램명 조합</td></tr>
+          <tr><td>단원 사진</td><td>추후 확보</td><td>초상권 동의 후 게시</td></tr>
+        </table>
+        <p style="margin-top:12px">사진 없이도 1차 론칭 가능: 단색 히어로 + 소개 문장 + 복지관 소속 띠</p>
+      </section>
+
+      <section>
+        <h2>7. 의견 요청</h2>
+        <p>아래 항목에 대한 의견을 주시면 디자인을 확정하고 개발에 들어갑니다.</p>
+        <table>
+          <tr><th style="width:5%">#</th><th>질문</th><th style="width:20%">선택지</th></tr>
+          <tr><td>1</td><td>색감 방향</td><td>A / <strong>B (추천)</strong> / C</td></tr>
+          <tr><td>2</td><td>복지관 로고 노출 위치</td><td>상단 띠 / 푸터 / 둘 다</td></tr>
+          <tr><td>3</td><td>히어로 문장</td><td>초안 수정 또는 새 문장 제안</td></tr>
+          <tr><td>4</td><td>공유 가능한 공연 사진</td><td>있음 / 추후 제공</td></tr>
+        </table>
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <p><strong>우리챔버오케스트라 홈페이지 프로젝트</strong> · 디자인 디렉션 v0.1 · 2026-08-28</p>
+      <p style="margin-top:6px">은평구립우리장애인복지관 소속 · goodwoori.or.kr</p>
+      <p style="margin-top:6px;font-size:12px">이 문서는 검토·공유용입니다. 브라우저에서 열거나 PDF로 저장(Ctrl+P)하여 배포할 수 있습니다.</p>
+    </footer>
+  </div>
+</body>
+</html>
