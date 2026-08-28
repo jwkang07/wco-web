@@ -68,7 +68,6 @@ export const nav: readonly NavItem[] = [
   {
     label: "우리단원",
     href: "/musicians",
-    description: "악기 분야별 연주자를 소개합니다.",
   },
   {
     label: "기업고용연계",
@@ -82,7 +81,6 @@ export const nav: readonly NavItem[] = [
   {
     label: "공연 문의",
     href: "/contact",
-    description: "공연 초청·협연·취재 문의를 남겨 주세요.",
   },
 ];
 

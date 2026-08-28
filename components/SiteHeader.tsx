@@ -87,24 +87,7 @@ function MegaMenuColumn({
               );
             })}
           </ul>
-        ) : (
-          <div className="flex h-full flex-col">
-            <p className="text-sm leading-relaxed text-wco-muted">
-              {item.description}
-            </p>
-            <Link
-              href={item.href}
-              onClick={onMenuClose}
-              className={`mt-auto inline-flex pt-4 text-sm font-semibold transition-colors ${
-                isHovered
-                  ? "text-wco-orange hover:underline"
-                  : "text-wco-grey hover:text-wco-orange"
-              }`}
-            >
-              페이지 바로가기 →
-            </Link>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
@@ -312,10 +295,6 @@ export function SiteHeader() {
                           );
                         })}
                       </ul>
-                    ) : item.description ? (
-                      <p className="mt-3 border-t border-white/80 pt-3 text-sm text-wco-muted">
-                        {item.description}
-                      </p>
                     ) : null}
                   </li>
                 );
