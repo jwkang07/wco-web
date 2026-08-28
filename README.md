@@ -20,12 +20,17 @@
 
 1차 골격 완료 — 우리챔버오케스트라 소개 · 활동 소개 · 단원 소개 · 기업고용연계 · 공연 문의
 
+## 배포
+
+- **Production**: https://wco-web.vercel.app
+- **Vercel 프로젝트**: `jwkang07-4525s-projects/wco-web`
+
 ```bash
 npm install
 npm run dev
+npm run build
+npx vercel deploy --prod
 ```
-
-http://localhost:3000
 
 개발 서버(`npm run dev`)는 `.next-dev` 캐시를 쓰고, 빌드(`npm run build`)는 `.next`를 사용합니다.  
 빌드와 개발을 동시에 돌려도 서버가 깨지지 않으며, 오류로 종료되면 2초 후 자동 재시작합니다.
