@@ -13,6 +13,7 @@ export default function AboutIntroPage() {
   return (
     <PageShell
       title="우리챔버오케스트라 소개"
+      sectionHref="/about"
       subNav={section.children}
     >
       <Section title={site.name}>

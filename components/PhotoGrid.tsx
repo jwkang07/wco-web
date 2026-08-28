@@ -14,7 +14,7 @@ export function PhotoGrid({ items }: PhotoGridProps) {
         <li key={`${item.year}-${item.title}`}>
           <figure className="overflow-hidden rounded-xl border border-wco-peach bg-white">
             <div
-              className="flex aspect-[4/3] items-center justify-center bg-wco-peach/60 text-sm text-wco-muted"
+              className="flex aspect-[4/3] items-center justify-center bg-neutral-100 text-sm text-wco-muted"
               style={
                 item.imageSrc
                   ? {

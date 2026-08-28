@@ -15,6 +15,7 @@ export default function ArtistApplicationPage() {
     <PageShell
       title="아티스트 접수"
       description="프로그램 참여를 희망하는 아티스트 접수 안내입니다."
+      sectionHref="/employment"
       subNav={section.children}
     >
       <Section>

@@ -15,6 +15,7 @@ export default function ConductorGreetingPage() {
   return (
     <PageShell
       title={content.title}
+      sectionHref="/about"
       subNav={section.children}
     >
       <GreetingBlock

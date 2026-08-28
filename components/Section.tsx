@@ -15,7 +15,7 @@ export function Section({
 }: SectionProps) {
   return (
     <section
-      className={variant === "peach" ? "bg-wco-peach" : "bg-white"}
+      className={variant === "peach" ? "bg-neutral-50" : "bg-white"}
     >
       <div className="container py-14 sm:py-16">
         {title ? (

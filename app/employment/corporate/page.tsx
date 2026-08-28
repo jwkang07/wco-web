@@ -15,6 +15,7 @@ export default function CorporateInquiryPage() {
     <PageShell
       title="기업 도입 문의"
       description="기업연계형 일자리 도입을 희망하는 기업·기관을 위한 문의입니다."
+      sectionHref="/employment"
       subNav={section.children}
     >
       <Section>

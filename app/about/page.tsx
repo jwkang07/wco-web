@@ -14,6 +14,7 @@ export default function AboutHubPage() {
     <PageShell
       title="우리챔버오케스트라"
       description="관장·단장 인삿말과 오케스트라를 소개합니다."
+      sectionHref="/about"
       subNav={section.children}
     >
       <SectionHub

@@ -14,6 +14,7 @@ export default function EmploymentHubPage() {
     <PageShell
       title="기업고용연계"
       description="기업연계형 일자리 프로그램과 참여 안내입니다."
+      sectionHref="/employment"
       subNav={section.children}
     >
       <SectionHub

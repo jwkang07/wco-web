@@ -4,17 +4,17 @@ export const site = {
   displayName: "Woori Chamber Orchestra (우리챔버오케스트라)",
   shortName: "WCO",
   description:
-    "은평구립우리장애인복지관 기업연계형 일자리. 발달장애 예술가가 연주자로 성장하는 우리챔버오케스트라입니다.",
-  tagline: "음악으로 세상과 만나는, 우리챔버오케스트라",
+    "은평구립우리장애인복지관 문화일자리와 기업연계형 일자리로 구성되어 있습니다. 발달장애 연주자가 협연으로 성장하는 우리챔버오케스트라입니다.",
+  taglineLines: ["음악으로 세상과 만나는,", "우리챔버오케스트라"] as const,
   parentOrg: "은평구립우리장애인복지관",
   programLabel: "기업연계형 일자리",
   parentOrgUrl: "https://www.goodwoori.or.kr/main/index.php",
   founded: 2023,
   locale: "ko_KR",
   hero: {
-    image: "/images/hero/placeholder.svg",
-    imageAlt: "우리챔버오케스트라 메인 비주얼",
-    imagePosition: "center",
+    image: "/images/hero/hero-main.png",
+    imageAlt: "우리챔버오케스트라 정기연주회 무대 전경",
+    imagePosition: "center 42%",
   },
   logo: {
     /** 상단 로고 — `public/images/logo/wco-header-logo.png` 교체 */
@@ -30,6 +30,14 @@ export const site = {
     orgLegal: "사회복지법인 굿피플",
     copyrightLine: "COPYRIGHT(C) Good Woori Community Center.",
   },
+} as const;
+
+/** 공연·활동 사진 (`public/images/`) */
+export const siteImages = {
+  heroMain: "/images/hero/hero-main.png",
+  photoRehearsal: "/images/photos/photo-rehearsal.png",
+  photoConcert: "/images/photos/photo-concert.png",
+  photoMusicians: "/images/photos/photo-musicians.png",
 } as const;
 
 export type NavChild = {
@@ -79,7 +87,7 @@ export const nav: readonly NavItem[] = [
     ],
   },
   {
-    label: "공연 문의",
+    label: "공연문의",
     href: "/contact",
   },
 ];

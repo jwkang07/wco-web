@@ -1,8 +1,11 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
+
+/** 모든 페이지 메인 비주얼 영역의 동일한 세로 높이 */
+export const HERO_HEIGHT_CLASS = "h-[360px] sm:h-[400px] lg:h-[440px]";
 
 type HeroProps = {
-  title: string;
+  title?: string;
+  titleLines?: readonly string[];
   description?: string;
   showCta?: boolean;
   imageSrc?: string;
@@ -12,6 +15,7 @@ type HeroProps = {
 
 export function Hero({
   title,
+  titleLines,
   description,
   showCta = false,
   imageSrc,
@@ -19,7 +23,9 @@ export function Hero({
   imagePosition = "center",
 }: HeroProps) {
   return (
-    <section className="relative overflow-hidden bg-wco-grey text-white">
+    <section
+      className={`relative shrink-0 overflow-hidden bg-wco-grey text-white ${HERO_HEIGHT_CLASS}`}
+    >
       {imageSrc ? (
         <>
           <div
@@ -38,24 +44,37 @@ export function Hero({
         </>
       ) : null}
 
-      <div className="container relative py-16 sm:py-24 lg:py-28">
-        <p className="text-sm font-medium text-white/70">{site.parentOrg}</p>
-        <h1 className="mt-3 max-w-2xl font-serif text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
-          {title}
-        </h1>
-        {description ? (
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-            {description}
-          </p>
-        ) : null}
-        {showCta ? (
-          <Link
-            href="/about"
-            className="mt-8 inline-flex rounded-full bg-wco-orange px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          >
-            우리챔버오케스트라 보기
-          </Link>
-        ) : null}
+      <div className="container relative h-full">
+        <div className="flex h-full flex-col pt-10 sm:pt-12 lg:pt-14">
+          <h1 className="line-clamp-2 min-h-[2.75rem] shrink-0 font-serif text-3xl font-bold leading-tight tracking-tight sm:min-h-[3.5rem] sm:text-4xl lg:min-h-[4.5rem] lg:text-5xl">
+            {titleLines ? (
+              titleLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))
+            ) : (
+              title
+            )}
+          </h1>
+          <div className="mt-3 min-h-[4.5rem] shrink-0 sm:mt-4">
+            {description ? (
+              <p className="max-w-[44rem] text-base leading-relaxed break-keep text-pretty text-white/85 sm:text-lg">
+                {description}
+              </p>
+            ) : null}
+          </div>
+          <div className="mt-6 h-11 shrink-0 sm:mt-8">
+            {showCta ? (
+              <Link
+                href="/about"
+                className="inline-flex rounded-full bg-wco-orange px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                우리챔버오케스트라 보기
+              </Link>
+            ) : null}
+          </div>
+        </div>
       </div>
     </section>
   );

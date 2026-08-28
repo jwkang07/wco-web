@@ -1,4 +1,4 @@
-import { site } from "./site";
+import { site, siteImages } from "./site";
 
 export const history = [
   { year: "2023", text: "기업연계형 일자리 프로그램으로 우리챔버오케스트라 출범" },
@@ -14,21 +14,25 @@ export const performancePhotos = [
     title: "제2회 정기연주회",
     caption: "별이 된 꿈, 세상을 물들이다",
     year: "2025",
+    imageSrc: siteImages.photoConcert,
   },
   {
     title: "지역 초청 공연",
     caption: "은평구 문화 행사 연주",
     year: "2024",
+    imageSrc: siteImages.heroMain,
   },
   {
     title: "연습 및 리허설",
     caption: "함께 만드는 무대",
     year: "2024",
+    imageSrc: siteImages.photoRehearsal,
   },
   {
     title: "정기연주회",
     caption: "첫 정기연주 무대",
     year: "2023",
+    imageSrc: siteImages.photoConcert,
   },
 ] as const;
 
@@ -57,6 +61,8 @@ export type MusicianMember = {
   name: string;
   role?: string;
   instrument: string;
+  photoSrc?: string;
+  photoAlt?: string;
 };
 
 export type MusicianSection = {
@@ -79,7 +85,7 @@ export const musicianSections: readonly MusicianSection[] = [
     description: "플루트, 클라리넷, 오보에 등",
     members: [
       { name: "단원 C", instrument: "플루트" },
-      { name: "단원 D", instrument: "클라리넷" },
+      { name: "단원 D", instrument: "클라리넷", photoSrc: "/images/members/member-clarinet.png", photoAlt: "클라리넷 연주 단원" },
     ],
   },
   {

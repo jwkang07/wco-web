@@ -4,20 +4,40 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { NavChild } from "@/lib/site";
 
+/** 하위 탭 영역 고정 높이 — 페이지 이동 시 레이아웃 흔들림 방지 */
+export const SUB_NAV_SLOT_CLASS = "h-14 shrink-0";
+
+type SubNavSlotProps = {
+  items?: readonly NavChild[];
+};
+
+export function SubNavSlot({ items }: SubNavSlotProps) {
+  if (!items?.length) {
+    return (
+      <div
+        className={`border-b border-wco-peach bg-white ${SUB_NAV_SLOT_CLASS}`}
+        aria-hidden
+      />
+    );
+  }
+
+  return <SubNav items={items} />;
+}
+
 type SubNavProps = {
   items: readonly NavChild[];
 };
 
-export function SubNav({ items }: SubNavProps) {
+function SubNav({ items }: SubNavProps) {
   const pathname = usePathname();
 
   return (
     <nav
       aria-label="하위 메뉴"
-      className="border-b border-wco-peach bg-white"
+      className={`border-b border-wco-peach bg-white ${SUB_NAV_SLOT_CLASS}`}
     >
-      <div className="container">
-        <ul className="flex gap-1 overflow-x-auto py-2 sm:justify-center sm:gap-2">
+      <div className="container flex h-full items-center">
+        <ul className="flex w-full items-center gap-1 overflow-x-auto sm:justify-center sm:gap-2">
           {items.map((item) => {
             const active = pathname === item.href;
             return (

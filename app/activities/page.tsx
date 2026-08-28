@@ -14,6 +14,7 @@ export default function ActivitiesHubPage() {
     <PageShell
       title="우리활동"
       description="히스토리, 공연 활동, 보도자료를 확인하실 수 있습니다."
+      sectionHref="/activities"
       subNav={section.children}
     >
       <SectionHub

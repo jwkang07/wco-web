@@ -16,7 +16,7 @@ export function GreetingBlock({
   return (
     <Section title={title}>
       <div className="mx-auto max-w-3xl">
-        <div className="mb-8 flex aspect-[16/9] max-w-md items-center justify-center rounded-xl bg-wco-peach/60 text-sm text-wco-muted">
+        <div className="mb-8 flex aspect-[16/9] max-w-md items-center justify-center rounded-xl bg-neutral-100 text-sm text-wco-muted">
           사진 준비 중
         </div>
         <p className="font-serif text-lg font-bold text-wco-grey">

@@ -8,7 +8,7 @@ import { nav, navMaxSubItems } from "@/lib/site";
 import { SiteLogo } from "@/components/SiteLogo";
 
 /** 하위 메뉴 영역 고정 높이 — 메뉴별 펼침 시 크기 변동 방지 */
-const SUB_AREA_MIN_H = `${navMaxSubItems * 2.25 + 1.5}rem`;
+const SUB_AREA_MIN_H = `${navMaxSubItems * 1.75 + 0.5}rem`;
 
 type HoverProps = {
   hoveredSection: string | null;
@@ -26,38 +26,34 @@ function MegaMenuColumn({
   const sectionActive =
     pathname === item.href || pathname.startsWith(`${item.href}/`);
   const isHovered = hoveredSection === item.href;
-  const isDimmed = hoveredSection !== null && !isHovered;
-  const borderTone = isHovered ? "border-wco-orange/30" : "border-wco-peach";
 
   return (
     <div
-      className={`flex min-h-full min-w-0 flex-col rounded-lg border-l-4 p-3 transition-[opacity,background-color,border-color] duration-200 ${
-        isHovered
-          ? "border-wco-orange bg-wco-peach"
-          : isDimmed
-            ? "border-transparent opacity-40"
-            : "border-transparent opacity-100"
+      className={`flex min-h-full min-w-0 flex-col px-4 py-2.5 ${
+        isHovered ? "bg-neutral-50/80" : "bg-transparent"
       }`}
       onMouseEnter={() => onHoverSection(item.href)}
     >
       <Link
         href={item.href}
         onClick={onMenuClose}
-        className={`block font-serif text-sm font-bold leading-snug transition-colors xl:text-base ${
-          isHovered || sectionActive
+        className={`block whitespace-nowrap font-serif text-sm font-semibold leading-tight transition-colors ${
+          sectionActive
             ? "text-wco-orange"
-            : "text-wco-grey hover:text-wco-orange"
+            : isHovered
+              ? "text-wco-orange"
+              : "text-wco-muted hover:text-wco-orange/85"
         }`}
       >
         {item.label}
       </Link>
 
-      <div
-        className={`mt-2 flex flex-col border-t pt-2 ${borderTone}`}
-        style={{ minHeight: SUB_AREA_MIN_H }}
-      >
-        {item.children ? (
-          <ul className="space-y-1.5">
+      {item.children ? (
+        <div
+          className="mt-1.5 flex flex-col border-t border-neutral-200/80 pt-1.5"
+          style={{ minHeight: SUB_AREA_MIN_H }}
+        >
+          <ul className="space-y-0.5">
             {item.children.map((child) => {
               const childActive = pathname === child.href;
               return (
@@ -66,19 +62,15 @@ function MegaMenuColumn({
                     href={child.href}
                     onClick={onMenuClose}
                     aria-current={childActive ? "page" : undefined}
-                    className={`block rounded-md px-2 py-1.5 text-sm leading-snug transition-colors ${
-                      isHovered
-                        ? childActive
-                          ? "bg-white font-semibold text-wco-orange"
-                          : "text-wco-grey hover:bg-white hover:text-wco-orange"
-                        : childActive
-                          ? "font-semibold text-wco-orange"
-                          : "text-wco-muted hover:text-wco-orange"
+                    className={`block rounded px-1 py-0.5 text-xs leading-snug transition-colors ${
+                      childActive
+                        ? "font-semibold text-wco-orange"
+                        : "text-wco-muted hover:text-wco-orange/85"
                     }`}
                   >
                     {child.label}
                     {child.note ? (
-                      <span className="ml-1 text-xs font-normal text-wco-muted">
+                      <span className="ml-1 text-[11px] font-normal text-wco-muted">
                         ({child.note})
                       </span>
                     ) : null}
@@ -87,8 +79,8 @@ function MegaMenuColumn({
               );
             })}
           </ul>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -110,12 +102,12 @@ function DesktopNavLink({
       aria-current={sectionActive ? "page" : undefined}
       onMouseEnter={() => onHoverSection(item.href)}
       onClick={onMenuClose}
-      className={`inline-flex items-center rounded-md px-2.5 py-2 text-sm font-semibold whitespace-nowrap transition-colors xl:px-3 xl:text-base ${
-        isHovered
-          ? "bg-wco-orange text-white"
-          : sectionActive
-            ? "text-wco-orange"
-            : "text-wco-grey hover:bg-wco-peach hover:text-wco-orange"
+      className={`inline-flex items-center px-2.5 py-2 text-sm font-semibold whitespace-nowrap transition-colors xl:px-3 xl:text-base ${
+        sectionActive
+          ? "text-wco-orange"
+          : isHovered
+            ? "text-wco-orange/90"
+            : "text-wco-muted hover:text-wco-orange/85"
       }`}
     >
       {item.label}
@@ -151,7 +143,7 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-wco-peach bg-white">
+    <header className="sticky top-0 z-50 shrink-0 border-b border-wco-peach bg-white">
       <div className="container flex h-16 items-center justify-between gap-4 lg:h-[4.5rem]">
         <SiteLogo />
 
@@ -176,17 +168,14 @@ export function SiteHeader() {
           </nav>
 
           <div
-            className={`absolute top-full right-0 left-1/2 z-50 w-screen max-w-none -translate-x-1/2 pt-2 transition-opacity duration-150 ${
+            className={`absolute top-full right-0 z-50 pt-1 transition-opacity duration-150 ${
               megaOpen
                 ? "visible pointer-events-auto opacity-100"
                 : "invisible pointer-events-none opacity-0"
             }`}
           >
-            <div className="border-t border-wco-peach bg-white shadow-lg">
-              <div
-                className="container grid grid-cols-5 items-stretch gap-4 py-5"
-                style={{ minHeight: `calc(${SUB_AREA_MIN_H} + 3.5rem)` }}
-              >
+            <div className="min-w-[50rem] w-max max-w-[min(100vw-2rem,58rem)] overflow-hidden rounded-sm border border-neutral-200/80 bg-white shadow-md">
+              <div className="grid grid-cols-5 divide-x divide-neutral-200/80">
                 {nav.map((item) => (
                   <MegaMenuColumn
                     key={item.href}

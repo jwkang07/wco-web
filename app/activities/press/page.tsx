@@ -16,6 +16,7 @@ export default function PressPage() {
     <PageShell
       title="보도자료"
       description="언론 보도 및 협력 기관 소식입니다."
+      sectionHref="/activities"
       subNav={section.children}
     >
       <Section title="보도자료">

@@ -15,6 +15,7 @@ export default function DirectorGreetingPage() {
   return (
     <PageShell
       title={content.title}
+      sectionHref="/about"
       subNav={section.children}
     >
       <GreetingBlock

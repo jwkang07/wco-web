@@ -19,9 +19,18 @@ export function MemberSections({ sections }: MemberSectionsProps) {
             {section.members.map((member) => (
               <li key={member.name + member.instrument}>
                 <article className="overflow-hidden rounded-xl border border-wco-peach bg-white">
-                  <div className="flex aspect-[3/4] items-center justify-center bg-wco-peach/50 text-xs text-wco-muted">
-                    사진 준비 중
-                  </div>
+                  {member.photoSrc ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={member.photoSrc}
+                      alt={member.photoAlt ?? member.name}
+                      className="aspect-[3/4] w-full object-cover object-top"
+                    />
+                  ) : (
+                    <div className="flex aspect-[3/4] items-center justify-center bg-neutral-100 text-xs text-wco-muted">
+                      사진 준비 중
+                    </div>
+                  )}
                   <div className="p-4">
                     <p className="font-serif text-base font-bold text-wco-grey">
                       {member.name}

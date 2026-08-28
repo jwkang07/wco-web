@@ -16,6 +16,7 @@ export default function ActivitiesPerformancesPage() {
     <PageShell
       title="공연 활동"
       description="정기연주회와 초청 공연 등 연주 활동을 사진으로 소개합니다."
+      sectionHref="/activities/performances"
       subNav={section.children}
     >
       <Section

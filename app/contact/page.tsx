@@ -5,14 +5,15 @@ import { Section } from "@/components/Section";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "공연 문의",
+  title: "공연문의",
 };
 
 export default function ContactPage() {
   return (
     <PageShell
-      title="공연 문의"
+      title="공연문의"
       description="공연 초청, 협연, 취재 관련 문의를 남겨 주세요."
+      sectionHref="/contact"
     >
       <Section>
         <div className="grid gap-10 lg:grid-cols-2">
@@ -51,7 +52,7 @@ export default function ContactPage() {
           </div>
 
           <InquiryForm
-            title="공연 문의 양식"
+            title="공연문의 양식"
             description="폼 연동은 다음 단계에서 추가합니다."
             fields={[
               { label: "이름", type: "text" },

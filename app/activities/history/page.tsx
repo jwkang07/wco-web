@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function HistoryPage() {
   return (
-    <PageShell title="히스토리" subNav={section.children}>
+    <PageShell title="히스토리" sectionHref="/activities" subNav={section.children}>
       <Section title="우리챔버오케스트라 히스토리">
         <ol className="max-w-2xl space-y-6">
           {history.map((item) => (

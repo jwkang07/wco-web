@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function EmploymentIntroPage() {
   return (
-    <PageShell title="고용 연계 소개" subNav={section.children}>
+    <PageShell title="고용 연계 소개" sectionHref="/employment" subNav={section.children}>
       <Section title="기업연계형 일자리">
         <div className="max-w-3xl space-y-4 text-base leading-relaxed text-wco-muted">
           <p>
