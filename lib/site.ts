@@ -5,6 +5,10 @@ export const site = {
   shortName: "WCO",
   description:
     "은평구립우리장애인복지관 문화일자리와 기업연계형 일자리로 구성되어 있습니다. 발달장애 연주자가 협연으로 성장하는 우리챔버오케스트라입니다.",
+  heroDescriptionLines: [
+    "은평구립우리장애인복지관 문화일자리와 기업연계형 일자리로 구성되어 있습니다.",
+    "발달장애 연주자가 협연으로 성장하는 우리챔버오케스트라입니다.",
+  ] as const,
   taglineLines: ["음악으로 세상과 만나는,", "우리챔버오케스트라"] as const,
   parentOrg: "은평구립우리장애인복지관",
   programLabel: "기업연계형 일자리",

@@ -27,7 +27,7 @@ export default function HomePage() {
     <>
       <Hero
         titleLines={site.taglineLines}
-        description={site.description}
+        descriptionLines={site.heroDescriptionLines}
         showCta
         imageSrc={site.hero.image}
         imageAlt={site.hero.imageAlt}

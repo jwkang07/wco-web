@@ -7,6 +7,7 @@ type HeroProps = {
   title?: string;
   titleLines?: readonly string[];
   description?: string;
+  descriptionLines?: readonly string[];
   showCta?: boolean;
   imageSrc?: string;
   imageAlt?: string;
@@ -17,6 +18,7 @@ export function Hero({
   title,
   titleLines,
   description,
+  descriptionLines,
   showCta = false,
   imageSrc,
   imageAlt = "",
@@ -58,7 +60,15 @@ export function Hero({
             )}
           </h1>
           <div className="mt-3 min-h-[4.5rem] shrink-0 sm:mt-4">
-            {description ? (
+            {descriptionLines ? (
+              <p className="max-w-[44rem] text-base leading-relaxed text-white/85 sm:text-lg">
+                {descriptionLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
+            ) : description ? (
               <p className="max-w-[44rem] text-base leading-relaxed break-keep text-pretty text-white/85 sm:text-lg">
                 {description}
               </p>
