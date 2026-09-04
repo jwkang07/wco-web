@@ -187,15 +187,21 @@ MAIL_TO_ADMIN=...
 
 ---
 
-## 7. SEO·메타 (향후)
+## 7. SEO·메타
 
-나무말미 수준으로 확장 시:
+기초 신호는 코드에 반영되어 있습니다.
 
-- `app/sitemap.ts`, `app/robots.ts`
-- `NEXT_PUBLIC_SITE_URL` 기준 canonical·OG
-- JSON-LD (Organization 등)
+| 항목 | 위치 |
+|------|------|
+| metadataBase · OG · Twitter · canonical | `app/layout.tsx` |
+| Organization(MusicGroup) JSON-LD | `components/JsonLd.tsx` + `lib/seo.ts` |
+| robots.txt | `app/robots.ts` |
+| sitemap.xml | `app/sitemap.ts` |
+| llms.txt (GEO) | `public/llms.txt` |
+| FAQPage schema | `app/contact/page.tsx` + `lib/seo.ts` |
 
-1차는 `layout.tsx`의 `metadata` + 페이지별 `title`로 충분.
+운영 도메인 확정 시 `NEXT_PUBLIC_SITE_URL`을 설정하고 `public/llms.txt` URL을 맞춥니다.
+시안 경로(`/contact1`~`3`)는 robots에서 disallow 합니다.
 
 ---
 

@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { PageShell } from "@/components/PageShell";
 import { musicianSections, type MusicianMember } from "@/lib/content";
+
+export const metadata: Metadata = {
+  title: "우리단원",
+  description:
+    "악기 분야별로 우리챔버오케스트라 연주자를 소개합니다.",
+  alternates: { canonical: "/musicians" },
+};
 
 export default function MusiciansPage() {
   return (

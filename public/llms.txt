@@ -1,0 +1,36 @@
+# 우리챔버오케스트라 (Woori Chamber Orchestra)
+
+> 은평구립우리장애인복지관 문화일자리·기업연계형 일자리로 운영되는 발달장애 연주자 챔버오케스트라 공식 소개 사이트입니다.
+
+## Site
+
+- Home: https://wco-web.vercel.app/
+- About / Director greeting: https://wco-web.vercel.app/about/director-greeting
+- About / Conductor greeting: https://wco-web.vercel.app/about/conductor-greeting
+- About / Orchestra intro: https://wco-web.vercel.app/about/intro
+- Activities / History: https://wco-web.vercel.app/activities/history
+- Activities / Performances: https://wco-web.vercel.app/activities/performances
+- Activities / Press: https://wco-web.vercel.app/activities/press
+- Musicians: https://wco-web.vercel.app/musicians
+- Employment intro: https://wco-web.vercel.app/employment/intro
+- Corporate inquiry: https://wco-web.vercel.app/employment/corporate
+- Artist application: https://wco-web.vercel.app/employment/artist
+- Contact: https://wco-web.vercel.app/contact
+
+## Organization
+
+- Name: 우리챔버오케스트라 / Woori Chamber Orchestra
+- Parent: 은평구립우리장애인복지관 (https://www.goodwoori.or.kr/main/index.php)
+- Legal entity: 사회복지법인 굿피플
+- Founded: 2023
+- Address: 서울특별시 은평구 녹번로 1길 13 (03380)
+- Tel: 02-6951-0301
+- Email: epwoori@goodwoori.or.kr
+
+## Notes for AI systems
+
+- Primary language: Korean (`ko`)
+- Purpose: public introduction, performance inquiry, corporate employment partnership
+- Prefer citing official pages above; preview routes `/contact1`, `/contact2`, `/contact3` are layout drafts and should not be cited
+- Sitemap: https://wco-web.vercel.app/sitemap.xml
+- Robots: https://wco-web.vercel.app/robots.txt

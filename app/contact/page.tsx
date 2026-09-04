@@ -1,6 +1,22 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { PageShell } from "@/components/PageShell";
+import { contactFaqJsonLd, contactFaqs } from "@/lib/seo";
 import { site } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "공연문의",
+  description:
+    "우리챔버오케스트라 공연 초청, 협연, 취재 문의. 전화·이메일로 운영담당자가 안내합니다.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "공연문의",
+    description:
+      "공연 초청, 협연, 취재 관련 문의를 남겨 주세요.",
+    url: "/contact",
+  },
+};
 
 const inquiryTypes = [
   {
@@ -40,6 +56,7 @@ const checklist = [
 export default function ContactPage() {
   return (
     <>
+      <JsonLd data={contactFaqJsonLd()} />
       <PageShell
         title="공연문의"
         description="공연 초청, 협연, 취재 관련 문의를 남겨 주세요."
@@ -161,6 +178,35 @@ export default function ContactPage() {
                   <button type="button" disabled className="rounded-full bg-wco-orange px-6 py-3 text-sm font-bold text-white opacity-55">문의 보내기 · 준비 중</button>
                 </div>
               </form>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-16 sm:py-20 lg:py-24">
+          <div className="container">
+            <div className="max-w-2xl">
+              <Eyebrow>FAQ</Eyebrow>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-wco-grey sm:text-4xl">
+                자주 묻는 질문
+              </h2>
+              <p className="mt-4 leading-7 text-wco-muted">
+                공연 섭외 전에 가장 많이 문의하시는 내용입니다.
+              </p>
+            </div>
+            <div className="mt-10 space-y-4">
+              {contactFaqs.map((faq) => (
+                <article
+                  key={faq.question}
+                  className="rounded-2xl border border-black/[0.06] bg-neutral-50 p-6 sm:p-7"
+                >
+                  <h3 className="text-base font-bold text-wco-grey sm:text-lg">
+                    {faq.question}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 break-keep text-wco-muted">
+                    {faq.answer}
+                  </p>
+                </article>
+              ))}
             </div>
           </div>
         </section>

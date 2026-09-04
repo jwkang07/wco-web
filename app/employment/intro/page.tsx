@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { nav, site } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "고용 연계 소개",
+  description:
+    "우리챔버오케스트라 기업연계형 일자리 프로그램 소개와 협력 안내입니다.",
+  alternates: { canonical: "/employment/intro" },
+};
 
 const section = nav.find((item) => item.href === "/employment")!;
 

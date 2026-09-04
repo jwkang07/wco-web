@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Hero } from "@/components/Hero";
 import { performancePhotos, pressArticles } from "@/lib/content";
 import { site, siteImages } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: { absolute: site.name },
+  description: site.description,
+  alternates: { canonical: "/" },
+};
 
 const memberPreviews = [
   { title: "현악기", description: "바이올린 · 비올라 · 첼로", image: siteImages.photoMusicians },

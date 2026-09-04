@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { nav, site } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "오케스트라 소개",
+  description:
+    "우리챔버오케스트라는 은평구립우리장애인복지관 기업연계형 일자리로, 발달장애 연주자가 협연으로 성장하는 오케스트라입니다.",
+  alternates: { canonical: "/about/intro" },
+};
 
 const section = nav.find((item) => item.href === "/about")!;
 const values = [

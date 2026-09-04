@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
 import { Section } from "@/components/Section";
 import { history } from "@/lib/content";
 import { nav } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "히스토리",
+  description: "우리챔버오케스트라의 연혁과 주요 활동을 소개합니다.",
+  alternates: { canonical: "/activities/history" },
+};
 
 const section = nav.find((item) => item.href === "/activities")!;
 
