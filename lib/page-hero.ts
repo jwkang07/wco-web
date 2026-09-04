@@ -9,7 +9,7 @@ export type PageHeroConfig = {
 /** 섹션별 기본 히어로 이미지 */
 export const pageHeroBySection: Record<string, PageHeroConfig> = {
   "/about": {
-    image: siteImages.heroMain,
+    image: siteImages.heroAbout,
     alt: "우리챔버오케스트라 정기연주회 무대 전경",
     position: "center 42%",
   },

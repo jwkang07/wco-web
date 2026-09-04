@@ -2,6 +2,7 @@ import Link from "next/link";
 
 /** 모든 페이지 메인 비주얼 영역의 동일한 세로 높이 */
 export const HERO_HEIGHT_CLASS = "h-[360px] sm:h-[400px] lg:h-[440px]";
+export const MAIN_HERO_HEIGHT_CLASS = "h-[432px] sm:h-[480px] lg:h-[528px]";
 
 type HeroProps = {
   title?: string;
@@ -12,6 +13,7 @@ type HeroProps = {
   imageSrc?: string;
   imageAlt?: string;
   imagePosition?: string;
+  mainVisual?: boolean;
 };
 
 export function Hero({
@@ -23,10 +25,11 @@ export function Hero({
   imageSrc,
   imageAlt = "",
   imagePosition = "center",
+  mainVisual = false,
 }: HeroProps) {
   return (
     <section
-      className={`relative shrink-0 overflow-hidden bg-wco-grey text-white ${HERO_HEIGHT_CLASS}`}
+      className={`relative shrink-0 overflow-hidden bg-wco-grey text-white ${mainVisual ? MAIN_HERO_HEIGHT_CLASS : HERO_HEIGHT_CLASS}`}
     >
       {imageSrc ? (
         <>

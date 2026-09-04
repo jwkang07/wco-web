@@ -18,7 +18,7 @@ export const site = {
   hero: {
     image: "/images/hero/hero-main.png",
     imageAlt: "우리챔버오케스트라 정기연주회 무대 전경",
-    imagePosition: "center 42%",
+    imagePosition: "center center",
   },
   logo: {
     /** 상단 로고 — `public/images/logo/wco-header-logo.png` 교체 */
@@ -39,6 +39,7 @@ export const site = {
 /** 공연·활동 사진 (`public/images/`) */
 export const siteImages = {
   heroMain: "/images/hero/hero-main.png",
+  heroAbout: "/images/hero/hero-about.png",
   photoRehearsal: "/images/photos/photo-rehearsal.png",
   photoConcert: "/images/photos/photo-concert.png",
   photoMusicians: "/images/photos/photo-musicians.png",

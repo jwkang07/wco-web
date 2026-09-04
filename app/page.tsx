@@ -32,6 +32,7 @@ export default function HomePage() {
         imageSrc={site.hero.image}
         imageAlt={site.hero.imageAlt}
         imagePosition={site.hero.imagePosition}
+        mainVisual
       />
 
       <SubNavSlot />
