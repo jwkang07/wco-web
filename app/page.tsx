@@ -23,10 +23,25 @@ export default function HomePage() {
             <p className="mt-6 max-w-2xl text-base leading-8 break-keep text-wco-muted">우리챔버오케스트라는 발달장애 예술가가 음악을 통해 사회에 참여하고 성장할 수 있도록 함께합니다. 정기연주회와 초청 공연을 통해 관객과 만나며 장애 인식 개선과 문화 나눔을 이어갑니다.</p>
             <Link href="/about/intro" className="mt-7 inline-flex text-sm font-bold text-wco-orange underline-offset-4 hover:underline">오케스트라 소개 보기 →</Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-wco-orange/15 bg-[#fff7f2] p-7"><strong className="text-3xl font-bold text-wco-orange">{site.founded}</strong><p className="mt-2 text-sm text-wco-muted">우리챔버오케스트라 출범</p></div>
-            <div className="rounded-2xl border border-wco-orange/15 bg-[#fff7f2] p-7"><strong className="text-xl font-bold text-wco-orange">문화일자리</strong><p className="mt-2 text-sm text-wco-muted">음악을 통한 사회 참여</p></div>
-            <div className="rounded-2xl border border-wco-orange/15 bg-[#fff7f2] p-7 sm:col-span-2"><strong className="text-xl font-bold text-wco-orange">기업연계형 일자리</strong><p className="mt-2 text-sm leading-6 text-wco-muted">예술가의 지속 가능한 성장과 기업의 사회적 가치를 연결합니다.</p></div>
+          <div className="grid gap-4 rounded-3xl bg-neutral-50 p-4 sm:grid-cols-2 sm:p-5">
+            <div className="relative min-h-44 overflow-hidden rounded-2xl bg-wco-grey p-7 text-white shadow-sm">
+              <span className="absolute -right-3 -top-8 text-[7rem] font-black leading-none text-white/[0.04]">23</span>
+              <p className="text-xs font-bold tracking-[0.16em] text-wco-orange">BEGINNING</p>
+              <strong className="mt-4 block text-4xl font-bold">{site.founded}</strong>
+              <p className="mt-2 text-sm text-white/70">우리챔버오케스트라 출범</p>
+            </div>
+            <div className="relative min-h-44 overflow-hidden rounded-2xl border border-wco-orange/15 bg-white p-7 shadow-sm">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-wco-orange text-xl font-bold text-white" aria-hidden>♪</span>
+              <strong className="mt-4 block text-xl font-bold text-wco-grey">문화일자리</strong>
+              <p className="mt-2 text-sm text-wco-muted">음악을 통한 사회 참여</p>
+            </div>
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-wco-orange to-[#f47a42] p-7 text-white shadow-[0_12px_30px_rgba(232,90,36,0.2)] sm:col-span-2">
+              <div className="absolute -right-10 -top-14 h-40 w-40 rounded-full border-[28px] border-white/10" aria-hidden />
+              <p className="text-xs font-bold tracking-[0.16em] text-white/75">CORPORATE PARTNERSHIP</p>
+              <strong className="mt-3 block text-2xl font-bold">기업연계형 일자리</strong>
+              <p className="mt-3 max-w-md text-sm leading-6 text-white/85">예술가의 지속 가능한 성장과 기업의 사회적 가치를 연결합니다.</p>
+              <Link href="/employment/intro" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-white">자세히 보기 <span className="transition-transform group-hover:translate-x-1">→</span></Link>
+            </div>
           </div>
         </div>
       </section>

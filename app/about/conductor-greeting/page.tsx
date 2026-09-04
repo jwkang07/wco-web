@@ -17,6 +17,7 @@ export default function ConductorGreetingPage() {
         title={content.title}
         name={content.name}
         org={content.org}
+        lead="연습과 열정이 모여, 우리만의 아름다운 하모니를 만듭니다."
         paragraphs={content.body}
       />
     </PageShell>

@@ -75,7 +75,6 @@ export const nav: readonly NavItem[] = [
       { label: "히스토리", href: "/activities/history" },
       { label: "공연 활동", href: "/activities/performances" },
       { label: "보도자료", href: "/activities/press" },
-      { label: "인터뷰", href: "/activities/interviews", note: "준비 중" },
     ],
   },
   {

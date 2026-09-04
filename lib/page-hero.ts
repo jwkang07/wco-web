@@ -52,11 +52,6 @@ export const pageHeroOverrides: Record<string, PageHeroConfig> = {
     alt: "우리챔버오케스트라 공연 무대",
     position: "center 35%",
   },
-  "/activities/interviews": {
-    image: siteImages.photoRehearsal,
-    alt: "우리챔버오케스트라 연습 장면",
-    position: "center",
-  },
 };
 
 export function resolvePageHero(pathname: string): PageHeroConfig | undefined {

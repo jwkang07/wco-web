@@ -17,6 +17,7 @@ export default function DirectorGreetingPage() {
         title={content.title}
         name={content.name}
         org={content.org}
+        lead="예술가의 가능성을 응원하고, 함께 성장하는 길을 열겠습니다."
         paragraphs={content.body}
       />
     </PageShell>
