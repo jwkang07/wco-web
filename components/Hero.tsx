@@ -43,7 +43,11 @@ export function Hero({
             aria-label={imageAlt}
           />
           <div
-            className="absolute inset-0 bg-gradient-to-r from-wco-grey/90 via-wco-grey/75 to-wco-grey/55"
+            className={`absolute inset-0 bg-gradient-to-r ${
+              mainVisual
+                ? "from-wco-grey/65 via-wco-grey/40 to-wco-grey/15"
+                : "from-wco-grey/90 via-wco-grey/75 to-wco-grey/55"
+            }`}
             aria-hidden
           />
         </>
