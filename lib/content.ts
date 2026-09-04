@@ -63,6 +63,7 @@ export type MusicianMember = {
   instrument: string;
   photoSrc?: string;
   photoAlt?: string;
+  photoCrop?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 };
 
 export type MusicianSection = {
@@ -73,27 +74,43 @@ export type MusicianSection = {
 
 export const musicianSections: readonly MusicianSection[] = [
   {
-    name: "현악",
-    description: "바이올린, 비올라, 첼로 등",
+    name: "현악기",
+    description: "바이올린, 비올라, 첼로, 더블베이스 등",
     members: [
-      { name: "단원 A", instrument: "바이올린" },
-      { name: "단원 B", instrument: "첼로" },
+      { name: "단원 A", instrument: "바이올린", photoSrc: "/images/members/temp-member-set-01.png", photoCrop: "top-left" },
+      { name: "단원 B", instrument: "바이올린", photoSrc: "/images/members/temp-member-set-02.png", photoCrop: "top-left" },
+      { name: "단원 C", instrument: "비올라", photoSrc: "/images/members/temp-member-set-03.png", photoCrop: "top-left" },
+      { name: "단원 D", instrument: "첼로", photoSrc: "/images/members/temp-member-set-04.png", photoCrop: "top-left" },
     ],
   },
   {
-    name: "목관",
-    description: "플루트, 클라리넷, 오보에 등",
+    name: "목관악기",
+    description: "플루트, 클라리넷, 오보에, 바순 등",
     members: [
-      { name: "단원 C", instrument: "플루트" },
-      { name: "단원 D", instrument: "클라리넷", photoSrc: "/images/members/member-clarinet.png", photoAlt: "클라리넷 연주 단원" },
+      { name: "단원 E", instrument: "플루트", photoSrc: "/images/members/temp-member-set-01.png", photoCrop: "top-right" },
+      { name: "단원 F", instrument: "플루트", photoSrc: "/images/members/temp-member-set-02.png", photoCrop: "top-right" },
+      { name: "단원 G", instrument: "클라리넷", photoSrc: "/images/members/temp-member-set-03.png", photoCrop: "top-right" },
+      { name: "단원 H", instrument: "오보에", photoSrc: "/images/members/temp-member-set-04.png", photoCrop: "top-right" },
     ],
   },
   {
-    name: "금관",
-    description: "트럼펫, 트롬본, 호른 등",
+    name: "금관악기",
+    description: "트럼펫, 트롬본, 호른, 튜바 등",
     members: [
-      { name: "단원 E", instrument: "트럼펫" },
-      { name: "단원 F", instrument: "트롬본" },
+      { name: "단원 I", instrument: "트럼펫", photoSrc: "/images/members/temp-member-set-01.png", photoCrop: "bottom-left" },
+      { name: "단원 J", instrument: "트럼펫", photoSrc: "/images/members/temp-member-set-02.png", photoCrop: "bottom-left" },
+      { name: "단원 K", instrument: "호른", photoSrc: "/images/members/temp-member-set-03.png", photoCrop: "bottom-left" },
+      { name: "단원 L", instrument: "트롬본", photoSrc: "/images/members/temp-member-set-04.png", photoCrop: "bottom-left" },
+    ],
+  },
+  {
+    name: "타악기",
+    description: "팀파니, 마림바, 스네어드럼, 심벌즈 등",
+    members: [
+      { name: "단원 M", instrument: "팀파니", photoSrc: "/images/members/temp-member-set-01.png", photoCrop: "bottom-right" },
+      { name: "단원 N", instrument: "마림바", photoSrc: "/images/members/temp-member-set-02.png", photoCrop: "bottom-right" },
+      { name: "단원 O", instrument: "스네어드럼", photoSrc: "/images/members/temp-member-set-03.png", photoCrop: "bottom-right" },
+      { name: "단원 P", instrument: "타악기", photoSrc: "/images/members/temp-member-set-04.png", photoCrop: "bottom-right" },
     ],
   },
 ];

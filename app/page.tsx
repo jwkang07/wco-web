@@ -5,8 +5,8 @@ import { performancePhotos, pressArticles } from "@/lib/content";
 import { site, siteImages } from "@/lib/site";
 
 const memberPreviews = [
-  { title: "현악", description: "바이올린 · 비올라 · 첼로", image: siteImages.photoMusicians },
-  { title: "목관", description: "플루트 · 클라리넷 · 오보에", image: "/images/members/member-clarinet.png" },
+  { title: "현악기", description: "바이올린 · 비올라 · 첼로", image: siteImages.photoMusicians },
+  { title: "목관악기", description: "플루트 · 클라리넷 · 오보에", image: "/images/members/member-clarinet.png" },
   { title: "함께 만드는 합주", description: "각자의 소리가 하나의 음악이 됩니다.", image: siteImages.photoRehearsal },
 ] as const;
 

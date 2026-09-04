@@ -84,7 +84,7 @@ export function Hero({
           <div className="mt-6 h-11 shrink-0 sm:mt-8">
             {showCta ? (
               <Link
-                href="/about"
+                href="/about/director-greeting"
                 className="inline-flex rounded-full bg-wco-orange px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 우리챔버오케스트라 보기
