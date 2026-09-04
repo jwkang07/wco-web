@@ -1,12 +1,7 @@
-import type { Metadata } from "next";
 import { InquiryForm } from "@/components/InquiryForm";
 import { PageShell } from "@/components/PageShell";
 import { Section } from "@/components/Section";
 import { site } from "@/lib/site";
-
-export const metadata: Metadata = {
-  title: "공연문의",
-};
 
 export default function ContactPage() {
   return (

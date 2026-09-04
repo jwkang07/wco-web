@@ -1,13 +1,8 @@
-import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
 import { Section } from "@/components/Section";
 import { nav } from "@/lib/site";
 
 const section = nav.find((item) => item.href === "/activities")!;
-
-export const metadata: Metadata = {
-  title: "인터뷰",
-};
 
 export default function InterviewsPage() {
   return (

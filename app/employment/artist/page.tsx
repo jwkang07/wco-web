@@ -1,14 +1,9 @@
-import type { Metadata } from "next";
 import { InquiryForm } from "@/components/InquiryForm";
 import { PageShell } from "@/components/PageShell";
 import { Section } from "@/components/Section";
 import { nav } from "@/lib/site";
 
 const section = nav.find((item) => item.href === "/employment")!;
-
-export const metadata: Metadata = {
-  title: "아티스트 접수",
-};
 
 export default function ArtistApplicationPage() {
   return (

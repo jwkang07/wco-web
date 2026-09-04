@@ -13,10 +13,7 @@ const notoSans = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: site.displayName,
-    template: `%s | ${site.displayName}`,
-  },
+  title: site.name,
   description: site.description,
   openGraph: {
     title: site.name,

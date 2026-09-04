@@ -1,12 +1,7 @@
-import type { Metadata } from "next";
 import { MemberSections } from "@/components/MemberSections";
 import { PageShell } from "@/components/PageShell";
 import { Section } from "@/components/Section";
 import { musicianSections } from "@/lib/content";
-
-export const metadata: Metadata = {
-  title: "우리단원",
-};
 
 export default function MusiciansPage() {
   return (

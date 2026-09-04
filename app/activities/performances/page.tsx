@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
 import { PhotoGrid } from "@/components/PhotoGrid";
 import { Section } from "@/components/Section";
@@ -6,10 +5,6 @@ import { performancePhotos } from "@/lib/content";
 import { nav } from "@/lib/site";
 
 const section = nav.find((item) => item.href === "/activities")!;
-
-export const metadata: Metadata = {
-  title: "공연 활동",
-};
 
 export default function ActivitiesPerformancesPage() {
   return (

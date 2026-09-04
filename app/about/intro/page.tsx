@@ -1,13 +1,8 @@
-import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
 import { Section } from "@/components/Section";
 import { site, nav } from "@/lib/site";
 
 const section = nav.find((item) => item.href === "/about")!;
-
-export const metadata: Metadata = {
-  title: "오케스트라 소개",
-};
 
 export default function AboutIntroPage() {
   return (

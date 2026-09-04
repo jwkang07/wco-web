@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
 import { PressList } from "@/components/PressList";
 import { Section } from "@/components/Section";
@@ -6,10 +5,6 @@ import { pressArticles } from "@/lib/content";
 import { nav } from "@/lib/site";
 
 const section = nav.find((item) => item.href === "/activities")!;
-
-export const metadata: Metadata = {
-  title: "보도자료",
-};
 
 export default function PressPage() {
   return (

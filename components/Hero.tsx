@@ -46,7 +46,7 @@ export function Hero({
             className={`absolute inset-0 bg-gradient-to-r ${
               mainVisual
                 ? "from-wco-grey/65 via-wco-grey/40 to-wco-grey/15"
-                : "from-wco-grey/90 via-wco-grey/75 to-wco-grey/55"
+                : "from-wco-grey/72 via-wco-grey/52 to-wco-grey/28"
             }`}
             aria-hidden
           />
