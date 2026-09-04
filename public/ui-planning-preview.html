@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>우리챔버오케스트라 UI 개선안</title>
+  <style>
+    :root { --orange:#e85a24; --ink:#262626; --muted:#6e6e6e; --soft:#fff6f1; --line:#ece7e3; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); font-family:"Noto Sans KR","Malgun Gothic",sans-serif; background:#fff; }
+    a { color:inherit; text-decoration:none; }
+    img { display:block; width:100%; }
+    .wrap { width:min(1120px,calc(100% - 40px)); margin:auto; }
+    .notice { padding:10px 20px; text-align:center; font-size:13px; color:#7b3c23; background:#fff0e8; border-bottom:1px solid #ffd7c4; }
+    header { height:84px; display:flex; align-items:center; border-bottom:3px solid var(--orange); background:#fff; }
+    header .wrap { display:flex; align-items:center; justify-content:space-between; gap:30px; }
+    .logo { width:230px; }
+    nav { display:flex; gap:36px; font-size:15px; font-weight:700; }
+    .hero { position:relative; height:570px; color:#fff; overflow:hidden; background:#2a201a; }
+    .hero::before { content:""; position:absolute; inset:0; background:url('/images/hero/hero-main.png') center/cover no-repeat; }
+    .hero::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,rgba(38,38,38,.7),rgba(38,38,38,.36) 48%,rgba(38,38,38,.08)); }
+    .hero .wrap { position:relative; z-index:1; height:100%; display:flex; align-items:center; }
+    .hero-copy { max-width:660px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:20px; font-size:14px; font-weight:700; letter-spacing:.04em; }
+    .eyebrow::before { content:""; width:28px; height:3px; background:var(--orange); }
+    h1 { margin:0; font-size:54px; line-height:1.18; letter-spacing:-.04em; }
+    .hero p { margin:24px 0 0; max-width:610px; font-size:18px; line-height:1.8; color:rgba(255,255,255,.88); word-break:keep-all; }
+    .buttons { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 24px; border-radius:999px; font-weight:700; font-size:14px; }
+    .primary { background:var(--orange); color:#fff; }
+    .ghost { border:1px solid rgba(255,255,255,.65); color:#fff; }
+    section { padding:86px 0; }
+    .section-head { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:34px; }
+    .section-head h2 { margin:0; font-size:36px; letter-spacing:-.035em; }
+    .section-head p { margin:12px 0 0; color:var(--muted); line-height:1.7; }
+    .more { flex:none; font-size:14px; font-weight:700; color:var(--orange); }
+    .intro { background:#fff; }
+    .intro-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:70px; align-items:center; }
+    .intro h2 { margin:0 0 20px; font-size:38px; line-height:1.35; letter-spacing:-.04em; }
+    .intro p { margin:0; color:var(--muted); line-height:1.9; word-break:keep-all; }
+    .stats { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .stat { padding:28px; border-radius:18px; background:var(--soft); border:1px solid #ffe3d5; }
+    .stat strong { display:block; font-size:27px; color:var(--orange); }
+    .stat span { display:block; margin-top:7px; font-size:14px; color:var(--muted); }
+    .performances { background:#f8f8f8; }
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+    .card { overflow:hidden; border-radius:18px; background:#fff; border:1px solid var(--line); box-shadow:0 8px 24px rgba(0,0,0,.04); }
+    .card img { aspect-ratio:4/3; object-fit:cover; }
+    .card-body { padding:22px; }
+    .tag { color:var(--orange); font-size:12px; font-weight:800; }
+    .card h3 { margin:10px 0 8px; font-size:20px; }
+    .card p { margin:0; color:var(--muted); font-size:14px; line-height:1.65; }
+    .member-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:22px; }
+    .member { position:relative; min-height:320px; overflow:hidden; border-radius:20px; color:#fff; }
+    .member img { position:absolute; inset:0; height:100%; object-fit:cover; }
+    .member::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,.7),transparent 62%); }
+    .member-copy { position:absolute; z-index:1; left:24px; right:24px; bottom:22px; }
+    .member h3 { margin:0; font-size:22px; }
+    .member p { margin:7px 0 0; color:rgba(255,255,255,.8); font-size:14px; }
+    .employment { padding:72px 0; color:#fff; background:var(--ink); }
+    .employment .wrap { display:grid; grid-template-columns:1.3fr .7fr; gap:50px; align-items:center; }
+    .employment h2 { margin:0; font-size:38px; line-height:1.35; }
+    .employment p { margin:18px 0 0; color:rgba(255,255,255,.72); line-height:1.8; }
+    .employment .buttons { justify-content:flex-end; margin:0; }
+    .updates { display:grid; grid-template-columns:1.1fr .9fr; gap:54px; }
+    .news-list { border-top:2px solid var(--ink); }
+    .news { display:grid; grid-template-columns:110px 1fr auto; gap:16px; align-items:center; padding:20px 4px; border-bottom:1px solid var(--line); }
+    .news time { color:var(--muted); font-size:13px; }
+    .news strong { font-size:15px; }
+    .news span { color:var(--orange); }
+    .contact-box { padding:34px; border-radius:22px; background:var(--soft); border:1px solid #ffe0d1; }
+    .contact-box h3 { margin:0; font-size:25px; }
+    .contact-box p { color:var(--muted); line-height:1.75; }
+    .contact-box .button { margin-top:12px; }
+    footer { padding:36px 0 48px; color:#aaa; background:#2b2b2b; font-size:13px; line-height:1.8; }
+    footer img { width:190px; filter:brightness(0) invert(1); opacity:.8; margin-bottom:20px; }
+    .annotation { display:inline-block; margin-left:10px; padding:3px 8px; border-radius:6px; background:#fff0e8; color:#a6461f; font-size:11px; vertical-align:middle; }
+    @media (max-width:820px) {
+      .wrap { width:min(100% - 32px,1120px); }
+      header { height:70px; }
+      .logo { width:190px; }
+      nav { display:none; }
+      .hero { height:560px; }
+      h1 { font-size:39px; }
+      .hero p { font-size:16px; }
+      section { padding:64px 0; }
+      .intro-grid,.employment .wrap,.updates { grid-template-columns:1fr; gap:34px; }
+      .cards,.member-row { grid-template-columns:1fr; }
+      .employment .buttons { justify-content:flex-start; }
+      .section-head { align-items:start; flex-direction:column; }
+      .news { grid-template-columns:1fr auto; }
+      .news time { grid-column:1/-1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="notice">기획 검토용 독립 목업 · 실제 홈페이지와 연결되지 않습니다.</div>
+  <header>
+    <div class="wrap">
+      <img class="logo" src="/images/logo/wco-header-logo.png" alt="우리챔버오케스트라" />
+      <nav aria-label="목업 메뉴">
+        <span>우리챔버오케스트라</span><span>우리활동</span><span>우리단원</span><span>기업고용연계</span><span>공연문의</span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero-copy">
+          <div class="eyebrow">WOORI CHAMBER ORCHESTRA</div>
+          <h1>음악으로 세상과 만나는,<br />우리챔버오케스트라</h1>
+          <p>은평구립우리장애인복지관 문화일자리와 기업연계형 일자리로 구성되어 있습니다.<br />발달장애 연주자가 협연으로 성장하는 오케스트라입니다.</p>
+          <div class="buttons"><span class="button primary">오케스트라 소개</span><span class="button ghost">공연 활동 보기</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="intro">
+      <div class="wrap intro-grid">
+        <div>
+          <div class="eyebrow" style="color:var(--orange)">ABOUT US</div>
+          <h2>한 사람 한 사람이<br />전문연주자로 서는 무대</h2>
+          <p>우리챔버오케스트라는 발달장애 예술가가 음악을 통해 사회에 참여하고 성장할 수 있도록 함께합니다. 정기연주회와 초청 공연을 통해 관객과 만나며 장애 인식 개선과 문화 나눔을 이어갑니다.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>2023</strong><span>창단 연도 <b class="annotation">확정 필요</b></span></div>
+          <div class="stat"><strong>00명</strong><span>함께하는 단원 <b class="annotation">자료 필요</b></span></div>
+          <div class="stat"><strong>00회</strong><span>누적 공연 <b class="annotation">자료 필요</b></span></div>
+          <div class="stat"><strong>5개</strong><span>주요 연주 분야</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="performances">
+      <div class="wrap">
+        <div class="section-head"><div><h2>최근 공연</h2><p>우리챔버오케스트라가 관객과 만난 무대를 소개합니다.</p></div><span class="more">전체 공연 보기 →</span></div>
+        <div class="cards">
+          <article class="card"><img src="/images/photos/photo-concert.png" alt="공연" /><div class="card-body"><span class="tag">정기연주회</span><h3>우리챔버오케스트라 정기공연</h3><p>공연 날짜와 장소, 함께한 이야기를 소개합니다.</p></div></article>
+          <article class="card"><img src="/images/hero/hero-main.png" alt="공연" /><div class="card-body"><span class="tag">초청공연</span><h3>지역사회와 함께한 무대</h3><p>관객과 음악으로 소통한 공연 현장입니다.</p></div></article>
+          <article class="card"><img src="/images/photos/photo-rehearsal.png" alt="연습" /><div class="card-body"><span class="tag">연주활동</span><h3>무대를 준비하는 시간</h3><p>한 곡을 완성하기 위해 함께 연습하고 성장합니다.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head"><div><h2>우리단원</h2><p>악기 분야별 연주자를 소개합니다.</p></div><span class="more">전체 단원 보기 →</span></div>
+        <div class="member-row">
+          <article class="member"><img src="/images/members/member-clarinet.png" alt="관악 단원" /><div class="member-copy"><h3>관악</h3><p>플루트 · 클라리넷 · 오보에</p></div></article>
+          <article class="member"><img src="/images/photos/photo-musicians.png" alt="현악 단원" /><div class="member-copy"><h3>현악</h3><p>바이올린 · 비올라 · 첼로</p></div></article>
+          <article class="member"><img src="/images/photos/photo-rehearsal.png" alt="합주" /><div class="member-copy"><h3>함께 만드는 합주</h3><p>각자의 소리가 하나의 음악이 됩니다.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="employment">
+      <div class="wrap">
+        <div><div class="eyebrow">EMPLOYMENT</div><h2>예술가의 지속 가능한 일,<br />기업과 함께 만듭니다.</h2><p>기업고용연계 제도의 취지와 참여 절차를 안내하고 상담으로 연결합니다.</p></div>
+        <div class="buttons"><span class="button primary">고용 연계 소개</span><span class="button ghost">기업 도입 문의</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap updates">
+        <div>
+          <div class="section-head"><div><h2>보도자료</h2><p>오케스트라의 새로운 소식을 전합니다.</p></div><span class="more">전체 보기 →</span></div>
+          <div class="news-list">
+            <div class="news"><time>2026.00.00</time><strong>우리챔버오케스트라 공연 소식</strong><span>→</span></div>
+            <div class="news"><time>2026.00.00</time><strong>기업고용연계 프로그램 소개</strong><span>→</span></div>
+            <div class="news"><time>2026.00.00</time><strong>지역사회와 함께한 문화예술 활동</strong><span>→</span></div>
+          </div>
+        </div>
+        <aside class="contact-box"><span class="tag">PERFORMANCE INQUIRY</span><h3>공연을 함께 만들고 싶으신가요?</h3><p>공연 초청, 취재, 협력 문의는 담당 연락처로 안내하고, 운영 체계 확정 후 온라인 접수 기능을 연결합니다.</p><span class="button primary">공연문의 안내</span></aside>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap"><img src="/images/logo/wco-header-logo.png" alt="우리챔버오케스트라" /><div>서울특별시 은평구 녹번로 1길 13 · 02-6951-0301<br />기획 검토용 목업 화면이며 실제 콘텐츠는 확정 자료로 교체되어야 합니다.</div></div></footer>
+</body>
+</html>
