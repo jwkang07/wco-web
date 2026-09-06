@@ -17,7 +17,7 @@ export default function MusiciansPage() {
         <div className="container">
           <div className="grid gap-7 border-b border-black/10 pb-10 lg:grid-cols-[1fr_0.8fr] lg:items-end">
             <div><p className="flex items-center gap-3 text-sm font-bold tracking-[0.14em] text-wco-orange before:h-0.5 before:w-8 before:bg-wco-orange">WOORI MUSICIANS</p><h2 className="mt-5 text-3xl font-bold leading-snug tracking-tight text-wco-grey sm:text-4xl">한 사람 한 사람의 소리가<br />우리의 하모니가 됩니다.</h2></div>
-            <p className="max-w-xl text-sm leading-7 break-keep text-wco-muted sm:text-base sm:leading-8">우리챔버오케스트라의 단원들은 각자의 악기와 음악으로 관객을 만납니다. 통일된 프로필 촬영 후 따뜻한 저채도 인물사진으로 순차적으로 소개합니다.</p>
+            <p className="max-w-xl text-sm leading-7 break-keep text-wco-muted sm:text-base sm:leading-8">우리챔버오케스트라의 단원들은 각자의 악기와 음악으로 관객을 만납니다. 서로 다른 소리가 하나의 하모니를 이루며, 무대 위에서 전문연주자로 성장해 갑니다.</p>
           </div>
 
           <nav className="mt-8 flex gap-2 overflow-x-auto pb-2" aria-label="악기 분야 바로가기">
