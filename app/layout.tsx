@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
-import { JsonLd } from "@/components/JsonLd";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
 import { absoluteUrl, getSiteUrl, organizationJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { JsonLd } from "@/components/JsonLd";
 import "./globals.css";
 
 const notoSans = Noto_Sans_KR({
@@ -33,9 +31,7 @@ export const metadata: Metadata = {
   authors: [{ name: site.parentOrg, url: site.parentOrgUrl }],
   creator: site.parentOrg,
   publisher: site.footer.orgLegal,
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   openGraph: {
     title: site.name,
     description: site.description,
@@ -43,12 +39,7 @@ export const metadata: Metadata = {
     siteName: site.displayName,
     locale: site.locale,
     type: "website",
-    images: [
-      {
-        url: site.hero.image,
-        alt: site.hero.imageAlt,
-      },
-    ],
+    images: [{ url: site.hero.image, alt: site.hero.imageAlt }],
   },
   twitter: {
     card: "summary_large_image",
@@ -56,21 +47,12 @@ export const metadata: Metadata = {
     description: site.description,
     images: [absoluteUrl(site.hero.image)],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
       <body
@@ -78,9 +60,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <JsonLd data={organizationJsonLd()} />
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
+        {children}
       </body>
     </html>
   );

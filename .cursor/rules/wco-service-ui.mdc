@@ -1,0 +1,29 @@
+---
+description: WCO 공개 서비스 UI — 브랜드·버튼 A/B·폼 피드백 (나무말미 원칙 + WCO 색)
+globs: app/**/*.tsx, components/**/*.tsx
+alwaysApply: false
+---
+
+# WCO 공개 서비스 UI
+
+관리자(`app/admin/**`, `components/admin/**`) 작업이면 이 규칙 대신 **wco-admin-ui**를 따른다.
+
+## 문서
+
+- `docs/UI_GUIDE.md` — 색·헤더·히어로·레이아웃
+- `docs/UI_BUTTON_GUIDE.md` — 패턴 A/B
+- `docs/UI_UX_GUIDE.md` — FormAlertMessages / FormSuccessPanel / 첫 오류만
+
+## 필수
+
+- 색: `wco-orange` / `wco-grey` / `wco-peach` / `wco-muted` 토큰
+- 공개 폼 주 버튼: `bg-wco-orange`, 패턴 A는 `w-full rounded-xl`
+- 검증 오류: 인라인, **첫 실패 필드만** + 포커스. 성공 `alert` 금지
+- `PageShell` / `Hero` 높이 상수 유지
+- 로고 PNG 임의 재가공 금지
+- 관리자 패턴 F(`#5a554c`, 하단 중앙 액션 바)를 공개 폼에 쓰지 말 것
+
+## 단원 이미지
+
+- 홈 미리보기: 특정 단원 얼굴 단독 노출 지양 (악기/손/단체 컷 권장)
+- 실명 초상은 동의 후에만

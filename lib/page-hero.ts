@@ -35,24 +35,10 @@ export const pageHeroBySection: Record<string, PageHeroConfig> = {
   },
 };
 
-/** 하위 페이지별 히어로 이미지 (섹션 기본값 대체) */
-export const pageHeroOverrides: Record<string, PageHeroConfig> = {
-  "/activities/performances": {
-    image: siteImages.photoConcert,
-    alt: "우리챔버오케스트라 공연 무대",
-    position: "center 35%",
-  },
-  "/activities/history": {
-    image: siteImages.heroMain,
-    alt: "우리챔버오케스트라 정기연주회 무대 전경",
-    position: "center 42%",
-  },
-  "/activities/press": {
-    image: siteImages.photoConcert,
-    alt: "우리챔버오케스트라 공연 무대",
-    position: "center 35%",
-  },
-};
+/** 하위 페이지별 히어로 이미지 (섹션 기본값 대체)
+ * 우리활동 하위(히스토리·공연·보도)는 섹션 기본 이미지를 공유한다.
+ */
+export const pageHeroOverrides: Record<string, PageHeroConfig> = {};
 
 export function resolvePageHero(pathname: string): PageHeroConfig | undefined {
   if (pageHeroOverrides[pathname]) {

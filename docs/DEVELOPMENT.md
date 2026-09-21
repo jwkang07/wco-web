@@ -1,7 +1,11 @@
 # 우리챔버오케스트라 — 개발 가이드
 
-코드 구조·배포·나무말미와 맞춘 개발 관행입니다.  
-UI 규칙은 [`UI_GUIDE.md`](UI_GUIDE.md)를 먼저 본다.
+코드 구조·배포·개발 관행입니다. 나무말미는 동일 UI 복제가 아니라 **기능·패턴 참고**입니다.
+
+- **코딩 규칙:** [`CODING_RULES.md`](CODING_RULES.md) (공개/관리자 경계)
+- **공개 UI:** [`UI_GUIDE.md`](UI_GUIDE.md) · [`UI_BUTTON_GUIDE.md`](UI_BUTTON_GUIDE.md) · [`UI_UX_GUIDE.md`](UI_UX_GUIDE.md)
+- **관리자 UI:** [`ADMIN_UI_GUIDE.md`](ADMIN_UI_GUIDE.md) · [`ADMIN_UI_BUTTON_GUIDE.md`](ADMIN_UI_BUTTON_GUIDE.md) · [`ADMIN_UI_UX_GUIDE.md`](ADMIN_UI_UX_GUIDE.md)
+- **문서 목록:** [`README.md`](README.md)
 
 ---
 
@@ -16,9 +20,11 @@ UI 규칙은 [`UI_GUIDE.md`](UI_GUIDE.md)를 먼저 본다.
 | 스타일 | Tailwind CSS v4 |
 | Node | **20+** (`.nvmrc` 권장) |
 | 배포 | Vercel (GitHub 연동 CI/CD) |
+| DB·파일 | **Supabase** (PostgreSQL + Storage) |
 
-> WCO 1차는 **정적 소개 + placeholder 폼** 위주.  
-> DB·메일·관리자는 2차에서 나무말미 패턴(Supabase, Server Actions, SMTP)을 그대로 이식합니다.
+> 공개: 소개 + 문의(접수 → 관리자 상태·메모). 답변 메일은 시스템이 보내지 않음.  
+> 관리자: 히어로·활동·단원·FAQ·문의·작업 이력. 단원 공개 동의는 이후.  
+> 이메일·외부 API 자동화는 1차 범위 밖.
 
 ---
 
@@ -40,12 +46,12 @@ npm run lint
 ```
 
 - `.env.local`은 **커밋 금지**
-- 배포: `git push origin main` (Vercel 자동) 또는 `npx vercel deploy --prod`
+- 배포: `git push origin main` 또는 `npx vercel deploy --prod`
 
 ### 나무말미와 같은 원칙
 
-1. **Git push → GitHub → Vercel Redeploy** (수동 FTP 배포 아님)
-2. `NEXT_PUBLIC_*`는 빌드 시점에 박힘 — URL 변경 시 **재빌드** 필요
+1. **Git push → GitHub → Vercel Redeploy**
+2. `NEXT_PUBLIC_*`는 빌드 시점에 박힘 — URL 변경 시 **재빌드**
 3. 시크릿 키는 서버 전용 — 클라이언트·Git에 넣지 않음
 
 ---
@@ -54,173 +60,105 @@ npm run lint
 
 ```
 wco_web/
-├── app/                    # App Router 페이지
-│   ├── layout.tsx          # Noto Sans KR, Header/Footer
+├── app/                    # App Router
+│   ├── layout.tsx          # 공개 셸
 │   ├── page.tsx            # 홈
-│   ├── about/              # 우리챔버오케스트라
-│   ├── activities/         # 우리활동
-│   ├── musicians/          # 우리단원
-│   ├── employment/         # 기업고용연계
-│   └── contact/            # 공연문의
-├── components/             # UI 컴포넌트
-│   ├── Hero.tsx            # 메인 비주얼 (고정 높이)
-│   ├── PageShell.tsx       # Hero + SubNav + 본문
-│   ├── SiteHeader.tsx
-│   ├── SiteFooter.tsx
-│   ├── InquiryForm.tsx     # → 2차: ContactFormClient 패턴으로 교체
-│   └── ...
+│   ├── about|activities|musicians|employment|contact/
+│   ├── admin/              # 관리자 (예정) — 공개 layout과 분리
+│   ├── robots.ts
+│   └── sitemap.ts
+├── components/
+│   ├── (공개) Hero, PageShell, SiteHeader …
+│   └── admin/              # 관리자 전용 컴포넌트 (예정)
 ├── lib/
-│   ├── site.ts             # 사이트 메타·nav·footer (단일 소스)
-│   └── content.ts          # 단원 등 정적 콘텐츠
+│   ├── site.ts · content.ts · seo.ts
+│   └── admin-* (예정)
 ├── public/
-│   └── images/
-├── docs/
-│   ├── UI_GUIDE.md
-│   └── DEVELOPMENT.md
+│   ├── images/
+│   └── llms.txt
+├── docs/                   # UI·코딩 가이드 (README.md)
 └── scripts/
-    └── dev-server.mjs      # 0.0.0.0 바인딩 dev
 ```
 
 ### 단일 소스
 
-- **메뉴·푸터·로고 경로**: `lib/site.ts`만 수정
-- **히어로 높이**: `components/Hero.tsx`의 `HERO_HEIGHT_CLASS`
-- **색 토큰**: `app/globals.css` `@theme`
+- **메뉴·푸터·로고:** `lib/site.ts`
+- **히어로 높이:** `components/Hero.tsx`
+- **색 토큰:** `app/globals.css` `@theme`
 
 ---
 
-## 4. 페이지 추가 방법
+## 4. 페이지 추가 (공개)
 
-1. `lib/site.ts`의 `nav`에 항목 추가 (필요 시 `children`)
-2. `app/{section}/page.tsx` 또는 `app/{section}/{slug}/page.tsx` 생성
-3. **`PageShell`** 사용 (히어로·서브내비 자동)
-4. [`UI_GUIDE.md`](UI_GUIDE.md) 체크리스트 확인
-
-```tsx
-import type { Metadata } from "next";
-import { PageShell } from "@/components/PageShell";
-import { nav } from "@/lib/site";
-
-const section = nav.find((item) => item.href === "/about")!;
-
-export const metadata: Metadata = { title: "페이지 제목" };
-
-export default function ExamplePage() {
-  return (
-    <PageShell title="페이지 제목" description="한 줄 설명" subNav={section.children}>
-      {/* 본문 */}
-    </PageShell>
-  );
-}
-```
+1. `lib/site.ts`의 `nav`에 항목 추가
+2. `app/{section}/page.tsx` 생성 + `PageShell`
+3. [`UI_GUIDE.md`](UI_GUIDE.md) 체크리스트
+4. 폼이면 [`UI_BUTTON_GUIDE.md`](UI_BUTTON_GUIDE.md) · [`UI_UX_GUIDE.md`](UI_UX_GUIDE.md)
 
 ---
 
-## 5. 폼·문의 연동 (2차 — 나무말미 그대로)
+## 5. 폼·문의 연동 (기능 참고)
 
-현재 `InquiryForm`은 disabled placeholder. 연동 시 **나무말미에서 파일 단위 복사·WCO 색상 치환**을 권장합니다.
+나무말미에 있는 아래 **기능**을 WCO에도 써도 된다. 파일을 그대로 붙이지 말고, WCO 컴포넌트·카피로 다시 맞춘다.
 
-### 5.1 복사·적용 대상
+| 참고할 기능 | WCO에서의 방향 |
+|-------------|----------------|
+| 폼 UI 유틸·인라인 피드백 | 공개 문의 폼에 같은 UX 원칙 적용 |
+| 성공 패널·액션 버튼 패턴 A/B | WCO 색·문구로 구현 |
+| 관리자 피드백·패턴 F | `components/admin/`에 WCO용으로 구현 |
+| 검증·honeypot·sanitize | 동일 원칙 |
 
-| 나무말미 | WCO (신규) |
-|----------|------------|
-| `lib/form-ui.ts` | `lib/form-ui.ts` (WCO 클래스, [UI_GUIDE §7.2](UI_GUIDE.md)) |
-| `lib/inquiry.ts` | `lib/inquiry.ts` (필드명·한도 동일) |
-| `components/FormAlertMessages.tsx` | 동일 |
-| `components/FormSuccessPanel.tsx` | 동일 |
-| `components/FormActions.tsx` | accent → `wco-orange` |
-| `app/contact/actions.ts` | Server Action + (선택) Supabase `inquiry` 테이블 |
-| `components/ContactFormClient.tsx` | `InquiryFormClient.tsx` 등으로 rename |
+검증: 이중 검증, 첫 오류만, honeypot, sanitize.
 
-### 5.2 UX 규칙 (요약)
+### 외부 연동
 
-- 클라이언트·서버 **이중 검증**, 첫 오류만 표시
-- `useActionState` + Server Actions
-- 완료: `FormSuccessPanel`, 오류: `FormAlertMessages`
-- honeypot, sanitize (`lib/inquiry.ts`)
-
-### 5.3 메일 (나무말미 DEPLOY.md 참고)
-
-연동 시 환경 변수 예:
-
-```env
-NEXT_PUBLIC_SITE_URL=https://wco-web.vercel.app
-SMTP_HOST=smtp.cafe24.com
-SMTP_PORT=587
-SMTP_USER=...
-SMTP_PASS=...
-MAIL_FROM=...
-MAIL_TO_ADMIN=...
-```
-
-미설정 시 DB 접수만 되고 알림 메일은 실패할 수 있음 (나무말미와 동일).
-
-### 5.4 DB (선택)
-
-나무말미처럼 Supabase 사용 시:
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (서버 전용)
-
-업로드 이미지는 Storage, 정적 CI·로고는 `public/`.
+| 항목 | WCO 1차 |
+|------|---------|
+| 문의 답변 | 전화·개별 메일(운영). 시스템 자동 답장 없음 |
+| 문의 관리 | 상태 변경 + 메모 |
+| 이메일·외부 API | 없음 |
+| DB·Storage | Supabase |
 
 ---
 
-## 6. 코드 스타일
+## 6. 코드 스타일 (요약)
+
+자세한 내용: [`CODING_RULES.md`](CODING_RULES.md)
 
 | 항목 | 규칙 |
 |------|------|
-| 컴포넌트 | Server Component 기본, 폼·헤더만 `"use client"` |
-| import | `@/` alias |
-| 타입 | `lib/site.ts`의 `NavItem`, `NavChild` 재사용 |
-| CSS | Tailwind 유틸, 임의 hex 지양 → `wco-*` 토큰 |
-| metadata | 페이지마다 `export const metadata` |
-| 범위 | 요청된 기능만 — unrelated 리팩터 금지 |
-
-### 나무말미 ARCHITECTURE에서 가져올 패턴 (2차)
-
-- Server Actions → `lib/*` 도메인 검증 → DB
-- DB `snake_case` ↔ UI `camelCase` **매퍼** 분리
-- `revalidatePath`로 ISR 갱신
-- 사용자 HTML 입력 **sanitize**
+| 컴포넌트 | Server Component 기본 |
+| CSS | 공개 `wco-*` / 관리자 중립 `#5a554c` |
+| 범위 | 요청된 기능만 |
 
 ---
 
 ## 7. SEO·메타
 
-기초 신호는 코드에 반영되어 있습니다.
-
 | 항목 | 위치 |
 |------|------|
-| metadataBase · OG · Twitter · canonical | `app/layout.tsx` |
-| Organization(MusicGroup) JSON-LD | `components/JsonLd.tsx` + `lib/seo.ts` |
-| robots.txt | `app/robots.ts` |
-| sitemap.xml | `app/sitemap.ts` |
-| llms.txt (GEO) | `public/llms.txt` |
-| FAQPage schema | `app/contact/page.tsx` + `lib/seo.ts` |
+| metadataBase · OG · canonical | `app/layout.tsx` |
+| JSON-LD | `components/JsonLd.tsx` + `lib/seo.ts` |
+| robots / sitemap / llms.txt | `app/robots.ts`, `app/sitemap.ts`, `public/llms.txt` |
 
-운영 도메인 확정 시 `NEXT_PUBLIC_SITE_URL`을 설정하고 `public/llms.txt` URL을 맞춥니다.
-시안 경로(`/contact1`~`3`)는 robots에서 disallow 합니다.
+도메인 확정 시 `NEXT_PUBLIC_SITE_URL` + `llms.txt` URL 갱신.  
+관리자·시안 경로는 sitemap/llms에 넣지 않음.
 
 ---
 
 ## 8. 로고·에셋
 
-- 헤더 로고: 사용자 제공 PNG → `public/images/logo/wco-header-logo.png`
-- **임의 재디자인·합성·과도한 트림 금지** ([UI_GUIDE §4.3](UI_GUIDE.md))
-- CI 원본: `docs/reference/woori_CI.ai`
+- 헤더 로고: 제공 PNG만 — 임의 재디자인 금지
+- CI: `docs/reference/woori_CI.ai`
 
 ---
 
-## 9. 체크리스트 (기능 추가·배포)
+## 9. 체크리스트
 
 - [ ] `npm run build` 통과
-- [ ] `lib/site.ts` nav/metadata 반영
-- [ ] 히어로·헤더가 UI 가이드와 일치
+- [ ] 올바른 UI 가이드(공개 vs 관리자) 준수
 - [ ] `.env*` 미커밋
-- [ ] (폼) 나무말미 inquiry·form-ui 패턴 준수
-- [ ] push 후 Vercel Preview/Production 확인
+- [ ] push 후 Vercel 확인
 
 ---
 
@@ -228,9 +166,6 @@ MAIL_TO_ADMIN=...
 
 | 문서 | 위치 |
 |------|------|
-| UI 가이드 | [`docs/UI_GUIDE.md`](UI_GUIDE.md) |
-| CI 색상 | [`docs/reference/goodwoori-ci-colors.md`](reference/goodwoori-ci-colors.md) |
-| README | [`README.md`](../README.md) |
-| 나무말미 배포 | `nm_dev/docs/DEPLOY.md` |
-| 나무말미 아키텍처 | `nm_dev/docs/ARCHITECTURE.md` |
-| 나무말미 폼 UX | `nm_dev/docs/UI_UX_GUIDE.md` |
+| 문서 인덱스 | [`README.md`](README.md) |
+| 코딩 규칙 | [`CODING_RULES.md`](CODING_RULES.md) |
+| 나무말미 | `nm_dev/docs/*` |

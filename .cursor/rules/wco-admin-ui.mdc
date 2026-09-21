@@ -1,0 +1,35 @@
+---
+description: WCO 관리자 UI — 패턴 F·AdminFormFeedback·공개 주황 금지 (나무말미 admin과 동일 원칙)
+globs: app/admin/**/*.tsx, app/admin/**/*.ts, components/admin/**/*.tsx
+alwaysApply: false
+---
+
+# WCO 관리자 UI
+
+공개 서비스 가이드와 **섞지 않는다.**
+
+## 문서
+
+- `docs/ADMIN_UI_GUIDE.md` — 셸·메뉴·레이아웃
+- `docs/ADMIN_UI_BUTTON_GUIDE.md` — 패턴 F
+- `docs/ADMIN_UI_UX_GUIDE.md` — 피드백·삭제 confirm·빈 목록
+
+## 필수
+
+- 폼 하단: `목록/취소` → `삭제?` → `등록/수정` (중앙 정렬)
+- 주 버튼: `#5a554c` 채움. **`wco-orange` 주 버튼 금지**
+- radius: `rounded` (공개 `rounded-xl`과 구분)
+- 삭제: outline + `confirm` (`adminConfirmDelete`), 대상 명시한 문구
+- 검증: `AdminFormFeedback` + `failAdminField` 첫 필드 포커스. 연속 `alert` 금지
+- 빈 목록: `AdminEmptyTableRow` + `adminEmptyListMessage`
+- `SiteHeader` / `PageShell` / `Hero`를 admin layout에 쓰지 말 것
+
+## 나무말미 참고
+
+메시지·피드백·빈 목록·삭제 confirm은 나무말미와 **동일 헬퍼/컴포넌트**를 쓴다.
+- `lib/admin-ui-messages.ts`
+- `lib/admin-form-focus.ts`
+- `components/admin/AdminFormFeedback.tsx`
+- `components/admin/AdminEmptyTableRow.tsx`
+- `components/admin/AdminActionForm.tsx`
+화면을 복제하지 않는다.

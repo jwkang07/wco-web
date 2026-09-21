@@ -79,11 +79,13 @@ export const contactFaqs = [
   },
 ] as const;
 
-export function contactFaqJsonLd() {
+export function contactFaqJsonLd(
+  faqs: readonly { question: string; answer: string }[] = contactFaqs,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: contactFaqs.map((faq) => ({
+    mainEntity: faqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
       acceptedAnswer: {

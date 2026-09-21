@@ -1,0 +1,34 @@
+import type { Metadata } from "next";
+import { PageShell } from "@/components/PageShell";
+import { Section } from "@/components/Section";
+import { getPublishedHistories } from "@/lib/public-content";
+import { nav } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "히스토리",
+  description: "우리챔버오케스트라의 연혁과 주요 활동을 소개합니다.",
+  alternates: { canonical: "/activities/history" },
+};
+
+const section = nav.find((item) => item.href === "/activities")!;
+
+export default async function HistoryPage() {
+  const history = await getPublishedHistories();
+
+  return (
+    <PageShell title="히스토리" sectionHref="/activities" subNav={section.children}>
+      <Section title="우리챔버오케스트라 히스토리">
+        <ol className="max-w-2xl space-y-6">
+          {history.map((item) => (
+            <li key={`${item.year}-${item.text}`} className="flex gap-4">
+              <span className="w-16 shrink-0 font-serif text-xl font-bold text-wco-orange">
+                {item.year}
+              </span>
+              <span className="pt-0.5 text-base text-wco-muted">{item.text}</span>
+            </li>
+          ))}
+        </ol>
+      </Section>
+    </PageShell>
+  );
+}

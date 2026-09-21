@@ -69,7 +69,7 @@ export type MusicianMember = {
 export type MusicianSection = {
   name: string;
   description: string;
-  members: readonly MusicianMember[];
+  members: MusicianMember[];
 };
 
 export const musicianSections: readonly MusicianSection[] = [

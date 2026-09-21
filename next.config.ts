@@ -6,6 +6,13 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["*.trycloudflare.com", "*.loca.lt"],
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "wtdvzvlizcvabziihsle.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
   },
 };
 

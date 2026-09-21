@@ -1,0 +1,32 @@
+---
+description: WCO 코딩 규칙 — 공개/관리자 경계, Server Actions, 시크릿, 나무말미 기능 참고
+globs: app/**/*.{ts,tsx}, components/**/*.{ts,tsx}, lib/**/*.ts
+alwaysApply: true
+---
+
+# WCO 코딩 규칙
+
+상세: `docs/CODING_RULES.md`, `docs/DEVELOPMENT.md`
+
+## 경계
+
+- 공개 컴포넌트 ↔ `components/admin/` 섞지 말 것
+- 공개 폼 UX ≠ 관리자 폼 UX (문서도 별도)
+
+## 구현
+
+- Server Component 기본, 필요할 때만 `"use client"`
+- Server Actions + `lib/*` 검증. DB는 mapper로 snake_case ↔ camelCase
+- 사용자 HTML sanitize. 관리자 저장 후 `revalidatePath`
+- 시크릿·`.env*` 커밋 금지. `SERVICE_ROLE`은 서버 전용
+
+## 스타일
+
+- 공개: `wco-*` 토큰
+- 관리자 주 액션: `#5a554c`
+- 요청 범위만 수정 (unrelated 리팩터 금지)
+
+## 실행
+
+명령·스키마·배포 등 **실행이 필요한 작업은 에이전트가 직접 수행**한다. 사용자에게 “직접 실행해 주세요”로 넘기지 않는다.
+(단, 브라우저 로그인·결제·외부 계정 생성처럼 사용자가 없으면 불가능한 인증만 예외.)
