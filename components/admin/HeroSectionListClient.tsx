@@ -113,7 +113,7 @@ export function HeroSectionListClient({
     <div>
       <AdminPageHeader
         title={`${sectionLabel} 상단비주얼`}
-        description="상단비주얼을 등록·수정한 뒤, 노출 선정 체크와 「노출 반영」으로 공개 화면에 적용합니다."
+        description="게시 상태로 등록·수정한 뒤 노출 선정과 「노출 반영」을 해야 공개 화면에 나갑니다. 비게시·미선정이면 기본 이미지로 대체되지 않고 히어로 이미지가 비어 있습니다."
       />
 
       <AdminFormFeedback

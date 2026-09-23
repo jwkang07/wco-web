@@ -6,7 +6,7 @@ import {
   type MusicianSection,
 } from "@/lib/content";
 import { contactFaqs as fallbackFaqs } from "@/lib/seo";
-import { site, siteImages } from "@/lib/site";
+import { siteImages } from "@/lib/site";
 import { createServiceClient, getSupabasePublicUrl } from "@/lib/supabase/admin";
 
 function media(path: string | null | undefined, fallback: string) {
@@ -38,11 +38,13 @@ export async function getPageHero(sectionKey: string) {
           .maybeSingle()
       ).data;
     if (!data) return null;
+    const image = getSupabasePublicUrl(data.image_path as string | null);
+    if (!image) return null;
     return {
       title: data.title as string,
       description: data.description as string,
-      image: media(data.image_path as string | null, site.hero.image),
-      alt: (data.image_alt as string) || site.hero.imageAlt,
+      image,
+      alt: (data.image_alt as string) || "",
       position: (data.image_position as string) || "center center",
     };
   } catch {

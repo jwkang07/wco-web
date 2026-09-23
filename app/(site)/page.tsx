@@ -29,12 +29,13 @@ export default async function HomePage() {
     getPublishedPerformances({ homeOnly: true }),
     getPublishedPress({ homeOnly: true }),
   ]);
+  /** 게시·선정된 CMS 상단비주얼만 이미지 사용. 없으면 기본 이미지로 대체하지 않음 */
   const heroTitle = homeHero?.title
     ? (homeHero.title.split(/\n|,\s*/).filter(Boolean) as string[])
     : [...site.taglineLines];
   const heroDesc = homeHero?.description
     ? [homeHero.description]
-    : [...site.heroDescriptionLines];
+    : undefined;
 
   return (
     <>
@@ -42,9 +43,9 @@ export default async function HomePage() {
         titleLines={heroTitle.length ? heroTitle : [...site.taglineLines]}
         descriptionLines={heroDesc}
         showCta
-        imageSrc={homeHero?.image ?? site.hero.image}
-        imageAlt={homeHero?.alt ?? site.hero.imageAlt}
-        imagePosition={homeHero?.position ?? site.hero.imagePosition}
+        imageSrc={homeHero?.image}
+        imageAlt={homeHero?.alt}
+        imagePosition={homeHero?.position}
         mainVisual
       />
 

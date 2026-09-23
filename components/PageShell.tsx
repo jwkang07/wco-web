@@ -3,13 +3,12 @@ import { Hero } from "@/components/Hero";
 import { SubNavSlot } from "@/components/SubNav";
 import { getPageHero } from "@/lib/public-content";
 import type { NavChild } from "@/lib/site";
-import { resolvePageHero } from "@/lib/page-hero";
 
 type PageShellProps = {
   title: string;
   description?: string;
   subNav?: readonly NavChild[];
-  /** 섹션 경로 — 히어로 이미지 자동 적용 (예: `/about`) */
+  /** 섹션 경로 — CMS 게시·선정 상단비주얼 적용 (예: `/about`) */
   sectionHref?: string;
   heroImage?: string;
   heroImageAlt?: string;
@@ -31,16 +30,15 @@ export async function PageShell({
     ? sectionHref.replace(/^\//, "").split("/")[0] || "home"
     : undefined;
   const dbHero = sectionKey ? await getPageHero(sectionKey) : null;
-  const resolved = sectionHref ? resolvePageHero(sectionHref) : undefined;
 
   return (
     <>
       <Hero
         title={title}
         description={description ?? (dbHero?.description || undefined)}
-        imageSrc={heroImage ?? dbHero?.image ?? resolved?.image}
-        imageAlt={heroImageAlt ?? dbHero?.alt ?? resolved?.alt}
-        imagePosition={heroImagePosition ?? dbHero?.position ?? resolved?.position}
+        imageSrc={heroImage ?? dbHero?.image}
+        imageAlt={heroImageAlt ?? dbHero?.alt}
+        imagePosition={heroImagePosition ?? dbHero?.position}
       />
       <SubNavSlot items={subNav} />
       {children}
