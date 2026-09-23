@@ -27,13 +27,13 @@ export type PublicPageHero = {
 async function fetchPageHero(sectionKey: string): Promise<PublicPageHero | null> {
   try {
     const sb = createServiceClient();
-    // 모든 메뉴·하위 동일: 게시 + 노출 선정 1건만
+    // 모든 메뉴·하위 동일: 게시된(노출) 1건만
     const { data } = await sb
       .from("page_heroes")
       .select("*")
       .eq("section_key", sectionKey)
-      .eq("is_selected", true)
       .eq("is_published", true)
+      .eq("is_selected", true)
       .order("sort_order", { ascending: true })
       .limit(1)
       .maybeSingle();

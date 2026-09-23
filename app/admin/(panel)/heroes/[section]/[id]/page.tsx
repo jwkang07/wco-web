@@ -55,7 +55,7 @@ export default async function AdminHeroEditPage({
     <div>
       <AdminPageHeader
         title={isNew ? `${label} 상단비주얼 등록` : `${label} 상단비주얼 수정`}
-        description="모든 메뉴 동일: 게시 저장 후 목록에서 「노출 선정」·「노출 반영」을 해야 해당 메뉴·하위 페이지에 적용됩니다. 비게시면 이미지가 표시되지 않습니다."
+        description="「게시」로 저장하면 바로 공개되고, 「비게시」로 저장하면 숨깁니다. 이 메뉴에 다른 게시 건이 있으면 자동으로 비게시됩니다."
       />
       <AdminFormCard>
         <AdminActionForm
@@ -203,8 +203,11 @@ export default async function AdminHeroEditPage({
                   name="is_published"
                   defaultChecked={row ? Boolean(row.is_published) : true}
                 />
-                게시
+                게시 (저장 즉시 공개 · 메뉴당 1건)
               </label>
+              <p className="mt-1.5 text-xs text-[#6B6B6B]">
+                체크 해제 후 저장하면 비게시되어 공개 화면에서 사라집니다.
+              </p>
             </AdminFormRow>
           </AdminFormFields>
 

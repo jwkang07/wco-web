@@ -229,13 +229,28 @@ export async function saveHeroAction(
     };
 
     if (id) {
-      const { error } = await sb.from("page_heroes").update(payload).eq("id", id);
-      if (error) return fail(error.message);
-      if (!payload.is_published) {
+      if (payload.is_published) {
+        // 게시 = 바로 노출. 같은 메뉴의 다른 건은 비게시·비해제로 정리
         await sb
           .from("page_heroes")
-          .update({ is_selected: false })
+          .update({
+            is_published: false,
+            is_selected: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("section_key", sectionKey)
+          .neq("id", id);
+        const { error } = await sb
+          .from("page_heroes")
+          .update({ ...payload, is_selected: true })
           .eq("id", id);
+        if (error) return fail(error.message);
+      } else {
+        const { error } = await sb
+          .from("page_heroes")
+          .update({ ...payload, is_selected: false })
+          .eq("id", id);
+        if (error) return fail(error.message);
       }
       await writeAuditLog({
         adminUsername: session.username,
@@ -245,15 +260,22 @@ export async function saveHeroAction(
         summary: `상단비주얼 수정: ${sectionKey}`,
       });
     } else {
-      const { count } = await sb
-        .from("page_heroes")
-        .select("id", { count: "exact", head: true })
-        .eq("section_key", sectionKey)
-        .eq("is_selected", true);
-      const shouldSelect = (count ?? 0) === 0 && payload.is_published;
+      if (payload.is_published) {
+        await sb
+          .from("page_heroes")
+          .update({
+            is_published: false,
+            is_selected: false,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("section_key", sectionKey);
+      }
       const { data: inserted, error } = await sb
         .from("page_heroes")
-        .insert({ ...payload, is_selected: shouldSelect })
+        .insert({
+          ...payload,
+          is_selected: payload.is_published,
+        })
         .select("id")
         .single();
       if (error) return fail(error.message);
@@ -277,60 +299,6 @@ export async function saveHeroAction(
   }
 }
 
-export async function applyHeroSelectionAction(
-  sectionKey: string,
-  selectedId: string,
-): Promise<{ ok: true } | { ok: false; error: string }> {
-  try {
-    const session = await requireAdminSession();
-    if (!isKnownHeroSection(sectionKey)) {
-      return { ok: false, error: "잘못된 메뉴입니다." };
-    }
-    const id = sanitizePlainLine(selectedId, 80);
-    if (!id) return { ok: false, error: "선정할 상단비주얼을 선택해 주세요." };
-
-    const sb = createServiceClient();
-    const { data: row } = await sb
-      .from("page_heroes")
-      .select("id, is_published, section_key")
-      .eq("id", id)
-      .maybeSingle();
-    if (!row || String(row.section_key) !== sectionKey) {
-      return { ok: false, error: "상단비주얼을 찾을 수 없습니다." };
-    }
-    if (!row.is_published) {
-      return { ok: false, error: "게시 상태인 상단비주얼만 노출 선정할 수 있습니다." };
-    }
-
-    await sb
-      .from("page_heroes")
-      .update({ is_selected: false, updated_at: new Date().toISOString() })
-      .eq("section_key", sectionKey);
-    const { error } = await sb
-      .from("page_heroes")
-      .update({ is_selected: true, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) return { ok: false, error: error.message };
-
-    await writeAuditLog({
-      adminUsername: session.username,
-      action: "update",
-      entityType: "page_heroes",
-      entityId: id,
-      summary: `상단비주얼 노출 선정: ${sectionKey}`,
-    });
-    revalidatePath("/");
-    revalidateHeroPublic(sectionKey);
-    revalidatePath(heroAdminListPath(sectionKey));
-    return { ok: true };
-  } catch (e) {
-    return {
-      ok: false,
-      error: e instanceof Error ? e.message : "선정 반영에 실패했습니다.",
-    };
-  }
-}
-
 export async function deleteHeroAction(formData: FormData) {
   const session = await requireAdminSession();
   const id = sanitizePlainLine(str(formData, "id"), 80);
@@ -341,26 +309,8 @@ export async function deleteHeroAction(formData: FormData) {
     .eq("id", id)
     .maybeSingle();
   const sectionKey = String(row?.section_key ?? "");
-  const wasSelected = Boolean(row?.is_selected);
   const { error } = await sb.from("page_heroes").delete().eq("id", id);
   if (error) throw new Error(error.message);
-
-  if (wasSelected && sectionKey) {
-    const { data: next } = await sb
-      .from("page_heroes")
-      .select("id")
-      .eq("section_key", sectionKey)
-      .eq("is_published", true)
-      .order("sort_order", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    if (next?.id) {
-      await sb
-        .from("page_heroes")
-        .update({ is_selected: true })
-        .eq("id", next.id);
-    }
-  }
 
   await writeAuditLog({
     adminUsername: session.username,
