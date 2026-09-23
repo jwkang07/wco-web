@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import {
   history as fallbackHistory,
   performancePhotos as fallbackPerformances,
@@ -7,16 +9,25 @@ import {
 } from "@/lib/content";
 import { contactFaqs as fallbackFaqs } from "@/lib/seo";
 import { siteImages } from "@/lib/site";
+import { heroCacheTag } from "@/lib/admin-heroes";
 import { createServiceClient, getSupabasePublicUrl } from "@/lib/supabase/admin";
 
 function media(path: string | null | undefined, fallback: string) {
   return getSupabasePublicUrl(path) || fallback;
 }
 
-export async function getPageHero(sectionKey: string) {
+export type PublicPageHero = {
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+  position: string;
+};
+
+async function fetchPageHero(sectionKey: string): Promise<PublicPageHero | null> {
   try {
     const sb = createServiceClient();
-    // 모든 메뉴 동일: 게시 + 노출 선정된 1건만. 미선정·비게시면 표시하지 않음(기본 이미지 대체 없음)
+    // 모든 메뉴·하위 동일: 게시 + 노출 선정 1건만
     const { data } = await sb
       .from("page_heroes")
       .select("*")
@@ -40,6 +51,15 @@ export async function getPageHero(sectionKey: string) {
     return null;
   }
 }
+
+/** 요청 내 중복 호출 합치기 + 태그로 섹션 전체 일괄 무효화 */
+export const getPageHero = cache(async (sectionKey: string) => {
+  return unstable_cache(
+    () => fetchPageHero(sectionKey),
+    ["page-hero", sectionKey],
+    { tags: [heroCacheTag(sectionKey)] },
+  )();
+});
 
 export async function getPublishedHistories() {
   try {

@@ -1,5 +1,5 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { adminPath } from "@/lib/admin-path";
-import { revalidatePath } from "next/cache";
 
 /** 상단비주얼 — 메뉴(섹션) 키와 표시명 */
 
@@ -43,6 +43,10 @@ const LABEL_BY_KEY = Object.fromEntries(
   HERO_SECTIONS.map((s) => [s.key, s.label]),
 ) as Record<string, string>;
 
+export function heroCacheTag(sectionKey: string) {
+  return `page-hero:${sectionKey}`;
+}
+
 export function heroSectionLabel(sectionKey: string): string {
   return LABEL_BY_KEY[sectionKey] ?? sectionKey;
 }
@@ -59,6 +63,7 @@ export function heroPublicPath(sectionKey: string): string {
 
 /** 해당 메뉴·모든 하위 페이지 공개 캐시 무효화 */
 export function revalidateHeroPublic(sectionKey: string) {
+  revalidateTag(heroCacheTag(sectionKey));
   if (!isKnownHeroSection(sectionKey)) {
     revalidatePath(heroPublicPath(sectionKey), "layout");
     return;
