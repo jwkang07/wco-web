@@ -55,7 +55,7 @@ export default async function AdminHeroEditPage({
     <div>
       <AdminPageHeader
         title={isNew ? `${label} 상단비주얼 등록` : `${label} 상단비주얼 수정`}
-        description="게시 상태로 저장한 뒤 목록에서 「노출 선정」·「노출 반영」을 해야 공개 화면에 나갑니다. 비게시면 히어로 이미지가 표시되지 않습니다."
+        description="모든 메뉴 동일: 게시 저장 후 목록에서 「노출 선정」·「노출 반영」을 해야 해당 메뉴·하위 페이지에 적용됩니다. 비게시면 이미지가 표시되지 않습니다."
       />
       <AdminFormCard>
         <AdminActionForm

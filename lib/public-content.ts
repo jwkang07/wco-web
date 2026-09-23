@@ -16,7 +16,8 @@ function media(path: string | null | undefined, fallback: string) {
 export async function getPageHero(sectionKey: string) {
   try {
     const sb = createServiceClient();
-    const { data: selected } = await sb
+    // 모든 메뉴 동일: 게시 + 노출 선정된 1건만. 미선정·비게시면 표시하지 않음(기본 이미지 대체 없음)
+    const { data } = await sb
       .from("page_heroes")
       .select("*")
       .eq("section_key", sectionKey)
@@ -25,18 +26,6 @@ export async function getPageHero(sectionKey: string) {
       .order("sort_order", { ascending: true })
       .limit(1)
       .maybeSingle();
-    const data =
-      selected ??
-      (
-        await sb
-          .from("page_heroes")
-          .select("*")
-          .eq("section_key", sectionKey)
-          .eq("is_published", true)
-          .order("sort_order", { ascending: true })
-          .limit(1)
-          .maybeSingle()
-      ).data;
     if (!data) return null;
     const image = getSupabasePublicUrl(data.image_path as string | null);
     if (!image) return null;

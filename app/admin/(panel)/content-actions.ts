@@ -17,8 +17,8 @@ import { requireAdminSession } from "@/lib/admin-session";
 import { uploadAdminImage } from "@/lib/admin-storage";
 import {
   heroAdminListPath,
-  heroPublicPath,
   isKnownHeroSection,
+  revalidateHeroPublic,
 } from "@/lib/admin-heroes";
 import { adminPath } from "@/lib/admin-path";
 import {
@@ -267,7 +267,7 @@ export async function saveHeroAction(
     }
 
     revalidatePath("/");
-    revalidatePath(heroPublicPath(sectionKey));
+    revalidateHeroPublic(sectionKey);
     revalidatePath(heroAdminListPath(sectionKey));
     revalidatePath("/admin/heroes");
     redirect(heroAdminListPath(sectionKey));
@@ -320,7 +320,7 @@ export async function applyHeroSelectionAction(
       summary: `상단비주얼 노출 선정: ${sectionKey}`,
     });
     revalidatePath("/");
-    revalidatePath(heroPublicPath(sectionKey));
+    revalidateHeroPublic(sectionKey);
     revalidatePath(heroAdminListPath(sectionKey));
     return { ok: true };
   } catch (e) {
@@ -371,7 +371,7 @@ export async function deleteHeroAction(formData: FormData) {
   });
   revalidatePath("/");
   if (sectionKey) {
-    revalidatePath(heroPublicPath(sectionKey));
+    revalidateHeroPublic(sectionKey);
     revalidatePath(heroAdminListPath(sectionKey));
   }
   revalidatePath("/admin/heroes");
