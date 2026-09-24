@@ -8,11 +8,10 @@ type PageShellProps = {
   title: string;
   description?: string;
   subNav?: readonly NavChild[];
-  /** 섹션 경로 — CMS 게시·선정 상단비주얼 적용 (예: `/about`) */
+  /** 섹션 경로 — CMS 게시 상단비주얼 적용 (예: `/about`) */
   sectionHref?: string;
   heroImage?: string;
   heroImageAlt?: string;
-  heroImagePosition?: string;
   children: ReactNode;
 };
 
@@ -23,7 +22,6 @@ export async function PageShell({
   sectionHref,
   heroImage,
   heroImageAlt,
-  heroImagePosition,
   children,
 }: PageShellProps) {
   const sectionKey = sectionHref
@@ -38,7 +36,6 @@ export async function PageShell({
         description={description ?? (dbHero?.description || undefined)}
         imageSrc={heroImage ?? dbHero?.image}
         imageAlt={heroImageAlt ?? dbHero?.alt}
-        imagePosition={heroImagePosition ?? dbHero?.position}
       />
       <SubNavSlot items={subNav} />
       {children}

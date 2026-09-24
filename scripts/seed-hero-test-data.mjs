@@ -62,7 +62,6 @@ async function main() {
         description: `${section.label} 상단비주얼 테스트 설명 ${n}번입니다.`,
         image_path: IMAGES[img % IMAGES.length],
         image_alt: `${section.label} 테스트 이미지 ${n}`,
-        image_position: n === 1 ? "center center" : "center top",
         is_published: publishFirst,
         is_selected: publishFirst,
         sort_order: n,

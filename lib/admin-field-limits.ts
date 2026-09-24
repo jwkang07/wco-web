@@ -7,7 +7,6 @@ export const ADMIN_LIMITS = {
     title: 120,
     description: 300,
     imageAlt: 120,
-    imagePosition: 40,
   },
   history: {
     year: 10,

@@ -18,7 +18,6 @@ export const site = {
   hero: {
     image: "/images/hero/hero-main.png",
     imageAlt: "우리챔버오케스트라 정기연주회 무대 전경",
-    imagePosition: "center center",
   },
   logo: {
     /** 상단 로고 — `public/images/logo/wco-header-logo.png` 교체 */

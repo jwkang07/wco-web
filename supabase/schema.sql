@@ -35,7 +35,6 @@ create table if not exists public.page_heroes (
   description text not null default '',
   image_path text,
   image_alt text not null default '',
-  image_position text not null default 'center center',
   is_selected boolean not null default false,
   is_published boolean not null default true,
   sort_order int not null default 0,
@@ -158,15 +157,15 @@ values
 on conflict (id) do nothing;
 
 -- 시드: 히어로 (메뉴당 1건 선정)
-insert into public.page_heroes (section_key, title, description, image_path, image_alt, image_position, is_selected, sort_order)
+insert into public.page_heroes (section_key, title, description, image_path, image_alt, is_selected, sort_order)
 select * from (values
-  ('home', '음악으로 세상과 만나는, 우리챔버오케스트라', '은평구립우리장애인복지관 문화일자리와 기업연계형 일자리로 구성되어 있습니다.', '/images/hero/hero-main.png', '우리챔버오케스트라 정기연주회 무대 전경', 'center center', true, 1),
-  ('about', '우리챔버오케스트라', '', '/images/hero/hero-about.png', '우리챔버오케스트라 정기연주회 무대 전경', 'center 42%', true, 1),
-  ('activities', '우리활동', '', '/images/photos/photo-rehearsal.png', '우리챔버오케스트라 연습 장면', 'center', true, 1),
-  ('musicians', '우리단원', '', '/images/photos/photo-musicians.png', '우리챔버오케스트라 단원 연주 장면', 'center 40%', true, 1),
-  ('employment', '기업고용연계', '', '/images/photos/photo-rehearsal.png', '우리챔버오케스트라 연습 및 협연 장면', 'center', true, 1),
-  ('contact', '공연문의', '', '/images/photos/photo-concert.png', '우리챔버오케스트라 공연 무대', 'center 35%', true, 1)
-) as v(section_key, title, description, image_path, image_alt, image_position, is_selected, sort_order)
+  ('home', '음악으로 세상과 만나는, 우리챔버오케스트라', '은평구립우리장애인복지관 문화일자리와 기업연계형 일자리로 구성되어 있습니다.', '/images/hero/hero-main.png', '우리챔버오케스트라 정기연주회 무대 전경', true, 1),
+  ('about', '우리챔버오케스트라', '', '/images/hero/hero-about.png', '우리챔버오케스트라 정기연주회 무대 전경', true, 1),
+  ('activities', '우리활동', '', '/images/photos/photo-rehearsal.png', '우리챔버오케스트라 연습 장면', true, 1),
+  ('musicians', '우리단원', '', '/images/photos/photo-musicians.png', '우리챔버오케스트라 단원 연주 장면', true, 1),
+  ('employment', '기업고용연계', '', '/images/photos/photo-rehearsal.png', '우리챔버오케스트라 연습 및 협연 장면', true, 1),
+  ('contact', '공연문의', '', '/images/photos/photo-concert.png', '우리챔버오케스트라 공연 무대', true, 1)
+) as v(section_key, title, description, image_path, image_alt, is_selected, sort_order)
 where not exists (select 1 from public.page_heroes limit 1);
 
 -- 시드: 히스토리

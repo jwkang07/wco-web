@@ -45,7 +45,6 @@ export default async function HomePage() {
         showCta
         imageSrc={homeHero?.image}
         imageAlt={homeHero?.alt}
-        imagePosition={homeHero?.position}
         mainVisual
       />
 

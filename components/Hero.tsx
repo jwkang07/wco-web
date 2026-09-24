@@ -12,7 +12,6 @@ type HeroProps = {
   showCta?: boolean;
   imageSrc?: string;
   imageAlt?: string;
-  imagePosition?: string;
   mainVisual?: boolean;
 };
 
@@ -24,7 +23,6 @@ export function Hero({
   showCta = false,
   imageSrc,
   imageAlt = "",
-  imagePosition = "center",
   mainVisual = false,
 }: HeroProps) {
   return (
@@ -34,10 +32,9 @@ export function Hero({
       {imageSrc ? (
         <>
           <div
-            className="absolute inset-0 bg-cover bg-no-repeat"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${imageSrc})`,
-              backgroundPosition: imagePosition,
             }}
             role="img"
             aria-label={imageAlt}

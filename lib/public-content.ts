@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import {
   history as fallbackHistory,
@@ -9,7 +8,6 @@ import {
 } from "@/lib/content";
 import { contactFaqs as fallbackFaqs } from "@/lib/seo";
 import { siteImages } from "@/lib/site";
-import { heroCacheTag } from "@/lib/admin-heroes";
 import { createServiceClient, getSupabasePublicUrl } from "@/lib/supabase/admin";
 
 function media(path: string | null | undefined, fallback: string) {
@@ -21,20 +19,19 @@ export type PublicPageHero = {
   description: string;
   image: string;
   alt: string;
-  position: string;
 };
 
 async function fetchPageHero(sectionKey: string): Promise<PublicPageHero | null> {
   try {
     const sb = createServiceClient();
-    // 모든 메뉴·하위 동일: 게시된(노출) 1건만
+    // 게시 1건만 — is_selected는 게시 저장 시 함께 맞춤
     const { data } = await sb
       .from("page_heroes")
-      .select("*")
+      .select("title, description, image_path, image_alt")
       .eq("section_key", sectionKey)
       .eq("is_published", true)
-      .eq("is_selected", true)
       .order("sort_order", { ascending: true })
+      .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
     if (!data) return null;
@@ -45,20 +42,15 @@ async function fetchPageHero(sectionKey: string): Promise<PublicPageHero | null>
       description: data.description as string,
       image,
       alt: (data.image_alt as string) || "",
-      position: (data.image_position as string) || "center center",
     };
   } catch {
     return null;
   }
 }
 
-/** 요청 내 중복 호출 합치기 + 태그로 섹션 전체 일괄 무효화 */
+/** 요청 내 중복 호출만 합침 — CMS 게시는 즉시 반영 (data cache 사용 안 함) */
 export const getPageHero = cache(async (sectionKey: string) => {
-  return unstable_cache(
-    () => fetchPageHero(sectionKey),
-    ["page-hero", sectionKey],
-    { tags: [heroCacheTag(sectionKey)] },
-  )();
+  return fetchPageHero(sectionKey);
 });
 
 export async function getPublishedHistories() {

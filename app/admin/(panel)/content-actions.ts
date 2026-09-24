@@ -18,8 +18,8 @@ import { uploadAdminImage } from "@/lib/admin-storage";
 import {
   heroAdminListPath,
   isKnownHeroSection,
-  revalidateHeroPublic,
 } from "@/lib/admin-heroes";
+import { revalidateHeroPublic } from "@/lib/admin-heroes-revalidate";
 import { adminPath } from "@/lib/admin-path";
 import {
   ADMIN_IMAGE_MESSAGE,
@@ -183,13 +183,6 @@ export async function saveHeroAction(
       ADMIN_LIMITS.hero.imageAlt,
     );
     if (!imageAlt.ok) return imageAlt.state;
-    const imagePosition = optionalLine(
-      str(formData, "image_position"),
-      "이미지 위치",
-      "field-image-position",
-      ADMIN_LIMITS.hero.imagePosition,
-    );
-    if (!imagePosition.ok) return imagePosition.state;
     const sort = parseSortOrder(str(formData, "sort_order"));
     if (!sort.ok) return sort.state;
 
@@ -221,7 +214,6 @@ export async function saveHeroAction(
       title: title.value,
       description: description.value,
       image_alt: imageAlt.value,
-      image_position: imagePosition.value || "center center",
       image_path: imagePath,
       is_published: bool(formData, "is_published"),
       sort_order: sort.value,

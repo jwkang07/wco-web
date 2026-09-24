@@ -83,12 +83,6 @@ export default async function AdminHeroEditPage({
               maxLength: ADMIN_LIMITS.hero.imageAlt,
             },
             {
-              name: "image_position",
-              fieldId: "field-image-position",
-              label: "이미지 위치",
-              maxLength: ADMIN_LIMITS.hero.imagePosition,
-            },
-            {
               name: "image",
               fieldId: "field-image",
               label: "이미지",
@@ -149,18 +143,6 @@ export default async function AdminHeroEditPage({
                   data-admin-focus
                   maxLength={ADMIN_LIMITS.hero.imageAlt}
                   defaultValue={String(row?.image_alt ?? "")}
-                  className={fieldClassName()}
-                />
-              </label>
-            </AdminFormRow>
-            <AdminFormRow>
-              <label className={labelClassName()} id="field-image-position">
-                이미지 위치 (CSS object-position)
-                <input
-                  name="image_position"
-                  data-admin-focus
-                  maxLength={ADMIN_LIMITS.hero.imagePosition}
-                  defaultValue={String(row?.image_position ?? "center center")}
                   className={fieldClassName()}
                 />
               </label>
