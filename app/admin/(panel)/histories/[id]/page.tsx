@@ -8,7 +8,7 @@ import {
   AdminFormFields,
   AdminFormRow,
   AdminPageHeader,
-  adminCheckClassName,
+  AdminPublishRadios,
   fieldClassName,
   labelClassName,
 } from "@/components/admin/AdminUi";
@@ -82,27 +82,9 @@ export default async function AdminHistoryEditPage({
               </label>
             </AdminFormRow>
             <AdminFormRow>
-              <label className={labelClassName()} id="field-sort">
-                정렬
-                <input
-                  name="sort_order"
-                  type="number"
-                  min={0}
-                  step={1}
-                  defaultValue={String(row?.sort_order ?? 0)}
-                  className={fieldClassName()}
-                />
-              </label>
-            </AdminFormRow>
-            <AdminFormRow>
-              <label className={adminCheckClassName()}>
-                <input
-                  type="checkbox"
-                  name="is_published"
-                  defaultChecked={row ? Boolean(row.is_published) : true}
-                />
-                공개
-              </label>
+              <AdminPublishRadios
+                defaultPublished={row ? Boolean(row.is_published) : true}
+              />
             </AdminFormRow>
           </AdminFormFields>
           <AdminFormActions

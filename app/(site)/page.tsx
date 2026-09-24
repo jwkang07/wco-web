@@ -5,6 +5,7 @@ import { Hero } from "@/components/Hero";
 import { musicianSections } from "@/lib/content";
 import {
   getPageHero,
+  getPublishedNotices,
   getPublishedPerformances,
   getPublishedPress,
 } from "@/lib/public-content";
@@ -24,11 +25,13 @@ const memberVisuals = [
 ] as const;
 
 export default async function HomePage() {
-  const [homeHero, performancePhotos, pressArticles] = await Promise.all([
-    getPageHero("home"),
-    getPublishedPerformances({ homeOnly: true }),
-    getPublishedPress({ homeOnly: true }),
-  ]);
+  const [homeHero, performancePhotos, pressArticles, homeNotices] =
+    await Promise.all([
+      getPageHero("home"),
+      getPublishedPerformances({ homeOnly: true }),
+      getPublishedPress({ homeOnly: true }),
+      getPublishedNotices({ homeOnly: true }),
+    ]);
   /** 게시·선정된 CMS 상단비주얼만 이미지 사용. 없으면 기본 이미지로 대체하지 않음 */
   const heroTitle = homeHero?.title
     ? (homeHero.title.split(/\n|,\s*/).filter(Boolean) as string[])
@@ -84,10 +87,34 @@ export default async function HomePage() {
           <SectionTitle title="최근 공연" description="우리챔버오케스트라가 관객과 만난 무대를 소개합니다." href="/activities/performances" linkLabel="전체 공연 보기" />
           <div className="grid gap-6 md:grid-cols-3">
             {performancePhotos.slice(0, 3).map((item) => (
-              <article key={item.title} className="group overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm">
-                <div className="relative aspect-[4/3] overflow-hidden"><Image src={item.imageSrc} alt={item.title} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" /></div>
-                <div className="p-6"><p className="text-xs font-bold text-wco-orange">{item.year}</p><h3 className="mt-2 text-xl font-bold text-wco-grey">{item.title}</h3><p className="mt-2 text-sm text-wco-muted">{item.caption}</p></div>
-              </article>
+              <Link
+                key={item.id}
+                href={
+                  item.id.startsWith("fallback-")
+                    ? "/activities/performances"
+                    : `/activities/performances/${item.id}`
+                }
+                className="group overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm"
+              >
+                <article>
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.title}
+                      fill
+                      sizes="(min-width: 768px) 33vw, 100vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <p className="text-xs font-bold text-wco-orange">{item.year}</p>
+                    <h3 className="mt-2 text-xl font-bold text-wco-grey group-hover:text-wco-orange">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-wco-muted">{item.caption}</p>
+                  </div>
+                </article>
+              </Link>
             ))}
           </div>
         </div>
@@ -129,15 +156,106 @@ export default async function HomePage() {
       </section>
 
       <section className="bg-white">
-        <div className="container grid gap-12 py-16 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:py-24">
-          <div>
-            <SectionTitle title="보도자료" description="오케스트라의 소식을 전합니다." href="/activities/press" linkLabel="전체 보기" />
-            <ul className="border-t-2 border-wco-grey">
-              {pressArticles.map((article) => <li key={article.title} className="border-b border-black/10"><Link href="/activities/press" className="grid gap-1 py-5 sm:grid-cols-[7rem_1fr] sm:items-center sm:gap-4"><time className="text-xs text-wco-muted">{article.date}</time><strong className="text-sm leading-6 text-wco-grey sm:text-base">{article.title}</strong></Link></li>)}
-            </ul>
+        <div className="container py-16 sm:py-20 lg:py-24">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-14 xl:gap-16">
+            <div className="min-w-0 w-full">
+              <NewsColumnTitle
+                title="공지사항"
+                description="공연·운영 관련 안내입니다."
+                href="/activities/notices"
+              />
+              {homeNotices.length > 0 ? (
+                <ul className="border-t-2 border-wco-grey">
+                  {homeNotices.map((notice) => (
+                    <li key={notice.id} className="border-b border-black/10">
+                      <Link
+                        href={`/activities/notices/${notice.id}`}
+                        className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3 py-4"
+                      >
+                        <time className="text-xs tabular-nums text-wco-muted">
+                          {notice.dateLabel}
+                        </time>
+                        <strong className="min-w-0 truncate text-sm leading-6 text-wco-grey sm:text-base">
+                          {notice.title}
+                        </strong>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="border-t-2 border-wco-grey py-8 text-sm text-wco-muted">
+                  등록된 공지사항이 없습니다.
+                </p>
+              )}
+            </div>
+
+            <div className="min-w-0 w-full">
+              <NewsColumnTitle
+                title="보도자료"
+                description="오케스트라의 소식을 전합니다."
+                href="/activities/press"
+              />
+              {pressArticles.length > 0 ? (
+                <ul className="border-t-2 border-wco-grey">
+                  {pressArticles.map((article) => (
+                    <li key={article.id} className="border-b border-black/10">
+                      <Link
+                        href={
+                          article.id.startsWith("fallback-")
+                            ? "/activities/press"
+                            : `/activities/press/${article.id}`
+                        }
+                        className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3 py-4"
+                      >
+                        <time className="text-xs tabular-nums text-wco-muted">
+                          {article.dateLabel || article.date}
+                        </time>
+                        <strong className="min-w-0 text-sm leading-6 text-wco-grey sm:text-base">
+                          {article.source ? (
+                            <span className="block truncate text-xs font-normal text-wco-muted">
+                              {article.source}
+                            </span>
+                          ) : null}
+                          <span
+                            className={
+                              article.source
+                                ? "mt-0.5 block truncate font-bold"
+                                : "block truncate"
+                            }
+                          >
+                            {article.title}
+                          </span>
+                        </strong>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="border-t-2 border-wco-grey py-8 text-sm text-wco-muted">
+                  등록된 보도자료가 없습니다.
+                </p>
+              )}
+            </div>
           </div>
-          <aside className="self-start rounded-3xl border border-wco-orange/15 bg-[#fff7f2] p-8 sm:p-10">
-            <p className="text-xs font-bold tracking-[0.1em] text-wco-orange">PERFORMANCE INQUIRY</p><h2 className="mt-4 text-2xl font-bold leading-snug text-wco-grey sm:text-3xl">공연을 함께 만들고 싶으신가요?</h2><p className="mt-4 leading-7 break-keep text-wco-muted">공연 초청, 취재, 협력 관련 문의를 안내해 드립니다.</p><Link href="/contact" className="mt-7 inline-flex rounded-full bg-wco-orange px-6 py-3 text-sm font-bold text-white hover:opacity-90">공연문의 안내</Link>
+
+          <aside className="mt-12 rounded-3xl border border-wco-orange/15 bg-[#fff7f2] p-8 sm:mt-14 sm:flex sm:items-center sm:justify-between sm:gap-10 sm:p-10">
+            <div className="max-w-xl">
+              <p className="text-xs font-bold tracking-[0.1em] text-wco-orange">
+                PERFORMANCE INQUIRY
+              </p>
+              <h2 className="mt-3 text-2xl font-bold leading-snug text-wco-grey sm:text-3xl">
+                공연을 함께 만들고 싶으신가요?
+              </h2>
+              <p className="mt-3 leading-7 break-keep text-wco-muted">
+                공연 초청, 취재, 협력 관련 문의를 안내해 드립니다.
+              </p>
+            </div>
+            <Link
+              href="/contact"
+              className="mt-6 inline-flex shrink-0 rounded-full bg-wco-orange px-6 py-3 text-sm font-bold text-white hover:opacity-90 sm:mt-0"
+            >
+              공연문의 안내
+            </Link>
           </aside>
         </div>
       </section>
@@ -147,6 +265,34 @@ export default async function HomePage() {
 
 function SectionTitle({ title, description, href, linkLabel }: { title: string; description: string; href: string; linkLabel: string }) {
   return <div className="mb-9 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><h2 className="text-3xl font-bold tracking-tight text-wco-grey sm:text-4xl">{title}</h2><p className="mt-3 text-wco-muted">{description}</p></div><Link href={href} className="shrink-0 text-sm font-bold text-wco-orange underline-offset-4 hover:underline">{linkLabel} →</Link></div>;
+}
+
+/** 홈 공지·보도 2열용 — 양쪽 동일 폭·동일 헤더 높이 */
+function NewsColumnTitle({
+  title,
+  description,
+  href,
+}: {
+  title: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <div className="mb-6 flex items-end justify-between gap-3">
+      <div className="min-w-0">
+        <h2 className="text-2xl font-bold tracking-tight text-wco-grey sm:text-3xl">
+          {title}
+        </h2>
+        <p className="mt-2 text-sm text-wco-muted">{description}</p>
+      </div>
+      <Link
+        href={href}
+        className="shrink-0 text-sm font-bold text-wco-orange underline-offset-4 hover:underline"
+      >
+        전체 보기 →
+      </Link>
+    </div>
+  );
 }
 
 function StringsArtwork() {

@@ -10,6 +10,8 @@ export type AdminNavItem = {
   label: string;
   href: string;
   children?: readonly AdminNavChild[];
+  /** 메뉴 위에 여백 (그룹 구분) */
+  spacedBefore?: boolean;
 };
 
 export const adminNav: AdminNavItem[] = [
@@ -22,23 +24,21 @@ export const adminNav: AdminNavItem[] = [
     })),
   },
   {
-    label: "히스토리",
+    label: "우리활동",
     href: adminPath("/histories"),
+    children: [
+      { label: "히스토리", href: adminPath("/histories") },
+      { label: "공연 활동", href: adminPath("/performances") },
+      { label: "보도자료", href: adminPath("/press") },
+      { label: "공지사항", href: adminPath("/notices") },
+    ],
   },
   {
-    label: "공연 활동",
-    href: adminPath("/performances"),
-  },
-  {
-    label: "보도자료",
-    href: adminPath("/press"),
-  },
-  {
-    label: "단원",
+    label: "우리단원",
     href: adminPath("/musicians"),
   },
   {
-    label: "문의",
+    label: "공연문의",
     href: adminPath("/inquiries"),
   },
   {
@@ -48,6 +48,7 @@ export const adminNav: AdminNavItem[] = [
   {
     label: "작업 이력",
     href: adminPath("/audit"),
+    spacedBefore: true,
   },
 ];
 

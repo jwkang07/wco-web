@@ -27,6 +27,7 @@ export const HERO_PUBLIC_PATHS: Record<HeroSectionKey, readonly string[]> = {
     "/activities/history",
     "/activities/performances",
     "/activities/press",
+    "/activities/notices",
   ],
   musicians: ["/musicians"],
   employment: [

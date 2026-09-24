@@ -14,7 +14,7 @@ import {
   adminPleaseSelect,
 } from "@/lib/admin-form-focus";
 import { requireAdminSession } from "@/lib/admin-session";
-import { uploadAdminImage } from "@/lib/admin-storage";
+import { uploadAdminImage, removeAdminImage } from "@/lib/admin-storage";
 import {
   heroAdminListPath,
   isKnownHeroSection,
@@ -24,10 +24,10 @@ import { adminPath } from "@/lib/admin-path";
 import {
   ADMIN_IMAGE_MESSAGE,
   isAllowedAdminImage,
-  isValidAdminLinkUrl,
   sanitizePlainLine,
   sanitizePlainMultiline,
 } from "@/lib/sanitize";
+import { isEmptyRichHtml, sanitizeRichHtml } from "@/lib/sanitize-html";
 import { createServiceClient } from "@/lib/supabase/admin";
 
 function str(formData: FormData, key: string) {
@@ -36,6 +36,11 @@ function str(formData: FormData, key: string) {
 
 function bool(formData: FormData, key: string) {
   return formData.get(key) === "on" || formData.get(key) === "true";
+}
+
+/** 게시/비게시 라디오 (value=true|false) */
+function publishedFromForm(formData: FormData) {
+  return str(formData, "is_published") !== "false";
 }
 
 function fail(message: string, fieldId?: string): AdminFormActionState {
@@ -94,16 +99,20 @@ function optionalMultiline(
   return { ok: true, value: sanitizePlainMultiline(value, max) };
 }
 
-function parseSortOrder(
-  raw: string,
-  fieldId = "field-sort",
-): { ok: true; value: number } | { ok: false; state: AdminFormActionState } {
-  if (!raw.trim()) return { ok: true, value: 0 };
-  const n = Number(raw);
-  if (!Number.isFinite(n) || n < 0 || !Number.isInteger(n)) {
-    return { ok: false, state: fail(adminInvalidNumber("정렬"), fieldId) };
+function requireRichHtml(
+  value: string,
+  label: string,
+  fieldId: string,
+  max: number,
+): { ok: true; value: string } | { ok: false; state: AdminFormActionState } {
+  if (value.length > max) {
+    return { ok: false, state: fail(adminTooLong(label, max), fieldId) };
   }
-  return { ok: true, value: n };
+  const cleaned = sanitizeRichHtml(value);
+  if (isEmptyRichHtml(cleaned)) {
+    return { ok: false, state: fail(adminPleaseEnter(label), fieldId) };
+  }
+  return { ok: true, value: cleaned };
 }
 
 function checkImageFile(
@@ -127,7 +136,11 @@ async function maybeUpload(
 ) {
   const file = formData.get(field);
   if (file instanceof File && file.size > 0) {
-    return uploadAdminImage({ bucket, file, prefix });
+    const next = await uploadAdminImage({ bucket, file, prefix });
+    if (existing && existing !== next) {
+      await removeAdminImage(existing);
+    }
+    return next;
   }
   return existing ?? null;
 }
@@ -162,29 +175,50 @@ export async function saveHeroAction(
       return fail(adminPleaseSelect("메뉴"), "field-section");
     }
 
-    const title = optionalLine(
-      str(formData, "title"),
-      "제목",
-      "field-title",
-      ADMIN_LIMITS.hero.title,
-    );
-    if (!title.ok) return title.state;
-    const description = optionalMultiline(
-      str(formData, "description"),
-      "설명",
-      "field-description",
-      ADMIN_LIMITS.hero.description,
-    );
-    if (!description.ok) return description.state;
-    const imageAlt = optionalLine(
-      str(formData, "image_alt"),
-      "이미지 대체 텍스트",
-      "field-image-alt",
-      ADMIN_LIMITS.hero.imageAlt,
-    );
-    if (!imageAlt.ok) return imageAlt.state;
-    const sort = parseSortOrder(str(formData, "sort_order"));
-    if (!sort.ok) return sort.state;
+    const isHome = sectionKey === "home";
+
+    let titleValue = "";
+    let descriptionValue = "";
+    let imageAltValue = "";
+
+    if (isHome) {
+      const title = optionalLine(
+        str(formData, "title"),
+        "제목",
+        "field-title",
+        ADMIN_LIMITS.hero.title,
+      );
+      if (!title.ok) return title.state;
+      const description = optionalMultiline(
+        str(formData, "description"),
+        "설명",
+        "field-description",
+        ADMIN_LIMITS.hero.description,
+      );
+      if (!description.ok) return description.state;
+      const imageTitle = optionalLine(
+        str(formData, "image_alt"),
+        "이미지 대체 텍스트",
+        "field-image-alt",
+        ADMIN_LIMITS.hero.imageAlt,
+      );
+      if (!imageTitle.ok) return imageTitle.state;
+      titleValue = title.value;
+      descriptionValue = description.value;
+      imageAltValue = imageTitle.value;
+    } else {
+      // 홈 외 메뉴 — 이미지제목만 사용 (목록 표시 + 접근성)
+      const imageTitle = requireLine(
+        str(formData, "image_alt"),
+        "이미지제목",
+        "field-image-alt",
+        ADMIN_LIMITS.hero.imageAlt,
+      );
+      if (!imageTitle.ok) return imageTitle.state;
+      titleValue = imageTitle.value;
+      descriptionValue = "";
+      imageAltValue = imageTitle.value;
+    }
 
     const sb = createServiceClient();
     let existingPath: string | null = null;
@@ -211,36 +245,34 @@ export async function saveHeroAction(
     );
     const payload = {
       section_key: sectionKey,
-      title: title.value,
-      description: description.value,
-      image_alt: imageAlt.value,
+      title: titleValue,
+      description: descriptionValue,
+      image_alt: imageAltValue,
       image_path: imagePath,
-      is_published: bool(formData, "is_published"),
-      sort_order: sort.value,
+      is_published: publishedFromForm(formData),
       updated_at: new Date().toISOString(),
     };
 
     if (id) {
       if (payload.is_published) {
-        // 게시 = 바로 노출. 같은 메뉴의 다른 건은 비게시·비해제로 정리
+        // 게시 = 바로 노출. 같은 메뉴의 다른 건은 비게시로 정리
         await sb
           .from("page_heroes")
           .update({
             is_published: false,
-            is_selected: false,
             updated_at: new Date().toISOString(),
           })
           .eq("section_key", sectionKey)
           .neq("id", id);
         const { error } = await sb
           .from("page_heroes")
-          .update({ ...payload, is_selected: true })
+          .update(payload)
           .eq("id", id);
         if (error) return fail(error.message);
       } else {
         const { error } = await sb
           .from("page_heroes")
-          .update({ ...payload, is_selected: false })
+          .update(payload)
           .eq("id", id);
         if (error) return fail(error.message);
       }
@@ -257,17 +289,13 @@ export async function saveHeroAction(
           .from("page_heroes")
           .update({
             is_published: false,
-            is_selected: false,
             updated_at: new Date().toISOString(),
           })
           .eq("section_key", sectionKey);
       }
       const { data: inserted, error } = await sb
         .from("page_heroes")
-        .insert({
-          ...payload,
-          is_selected: payload.is_published,
-        })
+        .insert(payload)
         .select("id")
         .single();
       if (error) return fail(error.message);
@@ -297,12 +325,13 @@ export async function deleteHeroAction(formData: FormData) {
   const sb = createServiceClient();
   const { data: row } = await sb
     .from("page_heroes")
-    .select("section_key, is_selected")
+    .select("section_key, image_path")
     .eq("id", id)
     .maybeSingle();
   const sectionKey = String(row?.section_key ?? "");
   const { error } = await sb.from("page_heroes").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await removeAdminImage(row?.image_path as string | null);
 
   await writeAuditLog({
     adminUsername: session.username,
@@ -330,15 +359,12 @@ export async function saveHistoryAction(
     if (!year.ok) return year.state;
     const body = requireMultiline(str(formData, "body"), "내용", "field-body", ADMIN_LIMITS.history.body);
     if (!body.ok) return body.state;
-    const sort = parseSortOrder(str(formData, "sort_order"));
-    if (!sort.ok) return sort.state;
 
     const id = sanitizePlainLine(str(formData, "id"), 80);
-    const payload = {
+    const payload: Record<string, unknown> = {
       year: year.value,
       body: body.value,
-      sort_order: sort.value,
-      is_published: bool(formData, "is_published"),
+      is_published: publishedFromForm(formData),
       updated_at: new Date().toISOString(),
     };
     const sb = createServiceClient();
@@ -353,6 +379,13 @@ export async function saveHistoryAction(
         summary: `히스토리 수정: ${payload.year}`,
       });
     } else {
+      const { data: maxRow } = await sb
+        .from("histories")
+        .select("sort_order")
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      payload.sort_order = Number(maxRow?.sort_order ?? 0) + 1;
       const { data, error } = await sb.from("histories").insert(payload).select("id").single();
       if (error) return fail(error.message);
       await writeAuditLog({
@@ -369,6 +402,48 @@ export async function saveHistoryAction(
   } catch (e) {
     if (isNextRedirect(e)) throw e;
     return fail(e instanceof Error ? e.message : "저장에 실패했습니다.");
+  }
+}
+
+/** 히스토리 목록 — ▲▼ 순서 교환 */
+export async function reorderHistoryAction(
+  id: string,
+  direction: "up" | "down",
+): Promise<AdminFormActionState> {
+  try {
+    await requireAdminSession();
+    const safeId = sanitizePlainLine(id, 80);
+    if (!safeId) return fail("대상을 확인할 수 없습니다.");
+    const sb = createServiceClient();
+    const { data, error } = await sb
+      .from("histories")
+      .select("id, sort_order")
+      .order("sort_order", { ascending: true })
+      .order("id", { ascending: true });
+    if (error) return fail(error.message);
+    const items = data ?? [];
+    const index = items.findIndex((row) => String(row.id) === safeId);
+    if (index < 0) return fail("대상을 찾을 수 없습니다.");
+    const swapWith = direction === "up" ? index - 1 : index + 1;
+    if (swapWith < 0 || swapWith >= items.length) return {};
+    const a = items[index];
+    const b = items[swapWith];
+    const now = new Date().toISOString();
+    const { error: e1 } = await sb
+      .from("histories")
+      .update({ sort_order: b.sort_order, updated_at: now })
+      .eq("id", a.id);
+    if (e1) return fail(e1.message);
+    const { error: e2 } = await sb
+      .from("histories")
+      .update({ sort_order: a.sort_order, updated_at: now })
+      .eq("id", b.id);
+    if (e2) return fail(e2.message);
+    revalidatePath("/activities/history");
+    revalidatePath("/admin/histories");
+    return {};
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "순서 변경에 실패했습니다.");
   }
 }
 
@@ -401,17 +476,22 @@ export async function savePerformanceAction(
 
     const title = requireLine(str(formData, "title"), "제목", "field-title", ADMIN_LIMITS.performance.title);
     if (!title.ok) return title.state;
-    const caption = optionalMultiline(
+    const year = requireLine(str(formData, "year"), "연도", "field-year", ADMIN_LIMITS.performance.year);
+    if (!year.ok) return year.state;
+    const caption = requireMultiline(
       str(formData, "caption"),
-      "캡션",
+      "목록요약",
       "field-caption",
       ADMIN_LIMITS.performance.caption,
     );
     if (!caption.ok) return caption.state;
-    const year = optionalLine(str(formData, "year"), "연도", "field-year", ADMIN_LIMITS.performance.year);
-    if (!year.ok) return year.state;
-    const sort = parseSortOrder(str(formData, "sort_order"));
-    if (!sort.ok) return sort.state;
+    const bodyHtml = requireRichHtml(
+      str(formData, "body_html"),
+      "본문",
+      "field-body",
+      ADMIN_LIMITS.performance.bodyHtml,
+    );
+    if (!bodyHtml.ok) return bodyHtml.state;
 
     const id = sanitizePlainLine(str(formData, "id"), 80);
     const sb = createServiceClient();
@@ -419,16 +499,23 @@ export async function savePerformanceAction(
     if (id) {
       const { data } = await sb.from("performances").select("image_path").eq("id", id).maybeSingle();
       existingPath = (data?.image_path as string | null) ?? null;
+    } else {
+      const file = formData.get("image");
+      if (!(file instanceof File) || file.size <= 0) {
+        return fail(adminPleaseEnter("이미지"), "field-image");
+      }
     }
     const imagePath = await maybeUpload(formData, "image", "performances", "perf", existingPath);
+    if (!imagePath) {
+      return fail(adminPleaseEnter("이미지"), "field-image");
+    }
     const payload = {
       title: title.value,
       caption: caption.value,
+      body_html: bodyHtml.value,
       year: year.value,
       image_path: imagePath,
-      show_on_home: bool(formData, "show_on_home"),
-      sort_order: sort.value,
-      is_published: bool(formData, "is_published"),
+      is_published: publishedFromForm(formData),
       updated_at: new Date().toISOString(),
     };
     if (id) {
@@ -441,6 +528,7 @@ export async function savePerformanceAction(
         entityId: id,
         summary: `공연 수정: ${payload.title}`,
       });
+      revalidatePath(`/activities/performances/${id}`);
     } else {
       const { data, error } = await sb.from("performances").insert(payload).select("id").single();
       if (error) return fail(error.message);
@@ -451,6 +539,7 @@ export async function savePerformanceAction(
         entityId: data.id,
         summary: `공연 등록: ${payload.title}`,
       });
+      revalidatePath(`/activities/performances/${data.id}`);
     }
     revalidatePath("/");
     revalidatePath("/activities/performances");
@@ -462,12 +551,99 @@ export async function savePerformanceAction(
   }
 }
 
+const PERFORMANCE_HOME_MAX = 3;
+
+/** 공연 목록 — 메인 노출 일괄 반영 */
+export async function applyPerformanceHomeAction(
+  formData: FormData,
+): Promise<AdminFormActionState> {
+  try {
+    const session = await requireAdminSession();
+    const ids = formData
+      .getAll("ids")
+      .map((v) => sanitizePlainLine(String(v), 80))
+      .filter(Boolean);
+    if (ids.length > PERFORMANCE_HOME_MAX) {
+      return fail(`메인 노출은 최대 ${PERFORMANCE_HOME_MAX}건까지 가능합니다.`);
+    }
+    const sb = createServiceClient();
+    const { error: clearErr } = await sb
+      .from("performances")
+      .update({ show_on_home: false, updated_at: new Date().toISOString() })
+      .neq("id", "00000000-0000-0000-0000-000000000000");
+    if (clearErr) return fail(clearErr.message);
+    if (ids.length) {
+      const { error } = await sb
+        .from("performances")
+        .update({ show_on_home: true, updated_at: new Date().toISOString() })
+        .in("id", ids);
+      if (error) return fail(error.message);
+    }
+    await writeAuditLog({
+      adminUsername: session.username,
+      action: "update",
+      entityType: "performances",
+      summary: `공연 메인 노출 반영: ${ids.length}건`,
+    });
+    revalidatePath("/");
+    revalidatePath("/activities/performances");
+    revalidatePath("/admin/performances");
+    return {};
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "반영에 실패했습니다.");
+  }
+}
+
+/** 공연 목록 — 상단 고정 일괄 반영 */
+export async function applyPerformancePinAction(
+  formData: FormData,
+): Promise<AdminFormActionState> {
+  try {
+    const session = await requireAdminSession();
+    const ids = formData
+      .getAll("ids")
+      .map((v) => sanitizePlainLine(String(v), 80))
+      .filter(Boolean);
+    const sb = createServiceClient();
+    const { error: clearErr } = await sb
+      .from("performances")
+      .update({ is_pinned: false, updated_at: new Date().toISOString() })
+      .neq("id", "00000000-0000-0000-0000-000000000000");
+    if (clearErr) return fail(clearErr.message);
+    if (ids.length) {
+      const { error } = await sb
+        .from("performances")
+        .update({ is_pinned: true, updated_at: new Date().toISOString() })
+        .in("id", ids);
+      if (error) return fail(error.message);
+    }
+    await writeAuditLog({
+      adminUsername: session.username,
+      action: "update",
+      entityType: "performances",
+      summary: `공연 상단 고정 반영: ${ids.length}건`,
+    });
+    revalidatePath("/");
+    revalidatePath("/activities/performances");
+    revalidatePath("/admin/performances");
+    return {};
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "반영에 실패했습니다.");
+  }
+}
+
 export async function deletePerformanceAction(formData: FormData) {
   const session = await requireAdminSession();
   const id = sanitizePlainLine(str(formData, "id"), 80);
   const sb = createServiceClient();
+  const { data: row } = await sb
+    .from("performances")
+    .select("image_path")
+    .eq("id", id)
+    .maybeSingle();
   const { error } = await sb.from("performances").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await removeAdminImage(row?.image_path as string | null);
   await writeAuditLog({
     adminUsername: session.username,
     action: "delete",
@@ -481,6 +657,87 @@ export async function deletePerformanceAction(formData: FormData) {
   redirect(adminPath("/performances"));
 }
 
+const PRESS_HOME_MAX = 5;
+
+/** 보도자료 목록 — 메인 노출 일괄 반영 */
+export async function applyPressHomeAction(
+  formData: FormData,
+): Promise<AdminFormActionState> {
+  try {
+    const session = await requireAdminSession();
+    const ids = formData
+      .getAll("ids")
+      .map((v) => sanitizePlainLine(String(v), 80))
+      .filter(Boolean);
+    if (ids.length > PRESS_HOME_MAX) {
+      return fail(`메인 노출은 최대 ${PRESS_HOME_MAX}건까지 가능합니다.`);
+    }
+    const sb = createServiceClient();
+    const { error: clearErr } = await sb
+      .from("press_articles")
+      .update({ show_on_home: false, updated_at: new Date().toISOString() })
+      .neq("id", "00000000-0000-0000-0000-000000000000");
+    if (clearErr) return fail(clearErr.message);
+    if (ids.length) {
+      const { error } = await sb
+        .from("press_articles")
+        .update({ show_on_home: true, updated_at: new Date().toISOString() })
+        .in("id", ids);
+      if (error) return fail(error.message);
+    }
+    await writeAuditLog({
+      adminUsername: session.username,
+      action: "update",
+      entityType: "press_articles",
+      summary: `보도 메인 노출 반영: ${ids.length}건`,
+    });
+    revalidatePath("/");
+    revalidatePath("/activities/press");
+    revalidatePath("/admin/press");
+    return {};
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "반영에 실패했습니다.");
+  }
+}
+
+/** 보도자료 목록 — 상단 고정 일괄 반영 */
+export async function applyPressPinAction(
+  formData: FormData,
+): Promise<AdminFormActionState> {
+  try {
+    const session = await requireAdminSession();
+    const ids = formData
+      .getAll("ids")
+      .map((v) => sanitizePlainLine(String(v), 80))
+      .filter(Boolean);
+    const sb = createServiceClient();
+    const { error: clearErr } = await sb
+      .from("press_articles")
+      .update({ is_pinned: false, updated_at: new Date().toISOString() })
+      .neq("id", "00000000-0000-0000-0000-000000000000");
+    if (clearErr) return fail(clearErr.message);
+    if (ids.length) {
+      const { error } = await sb
+        .from("press_articles")
+        .update({ is_pinned: true, updated_at: new Date().toISOString() })
+        .in("id", ids);
+      if (error) return fail(error.message);
+    }
+    await writeAuditLog({
+      adminUsername: session.username,
+      action: "update",
+      entityType: "press_articles",
+      summary: `보도 상단 고정 반영: ${ids.length}건`,
+    });
+    revalidatePath("/");
+    revalidatePath("/activities/press");
+    revalidatePath("/admin/press");
+    return {};
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "반영에 실패했습니다.");
+  }
+}
+
 export async function savePressAction(
   _prev: AdminFormActionState,
   formData: FormData,
@@ -491,13 +748,13 @@ export async function savePressAction(
     if (!title.ok) return title.state;
     const source = optionalLine(str(formData, "source"), "출처", "field-source", ADMIN_LIMITS.press.source);
     if (!source.ok) return source.state;
-    const hrefRaw = optionalLine(str(formData, "href"), "링크", "field-href", ADMIN_LIMITS.press.href);
-    if (!hrefRaw.ok) return hrefRaw.state;
-    if (!isValidAdminLinkUrl(hrefRaw.value || "#")) {
-      return fail("올바른 링크 주소(http/https 또는 /경로)를 입력해 주세요.", "field-href");
-    }
-    const sort = parseSortOrder(str(formData, "sort_order"));
-    if (!sort.ok) return sort.state;
+    const bodyHtml = requireRichHtml(
+      str(formData, "body_html"),
+      "본문",
+      "field-body",
+      ADMIN_LIMITS.press.bodyHtml,
+    );
+    if (!bodyHtml.ok) return bodyHtml.state;
 
     const id = sanitizePlainLine(str(formData, "id"), 80);
     const publishedOn = sanitizePlainLine(str(formData, "published_on"), 20) || null;
@@ -505,10 +762,8 @@ export async function savePressAction(
       title: title.value,
       source: source.value,
       published_on: publishedOn,
-      href: hrefRaw.value || "#",
-      show_on_home: bool(formData, "show_on_home"),
-      sort_order: sort.value,
-      is_published: bool(formData, "is_published"),
+      body_html: bodyHtml.value,
+      is_published: publishedFromForm(formData),
       updated_at: new Date().toISOString(),
     };
     const sb = createServiceClient();
@@ -522,8 +777,13 @@ export async function savePressAction(
         entityId: id,
         summary: `보도 수정: ${payload.title}`,
       });
+      revalidatePath(`/activities/press/${id}`);
     } else {
-      const { data, error } = await sb.from("press_articles").insert(payload).select("id").single();
+      const { data, error } = await sb
+        .from("press_articles")
+        .insert({ ...payload, href: "#" })
+        .select("id")
+        .single();
       if (error) return fail(error.message);
       await writeAuditLog({
         adminUsername: session.username,
@@ -532,6 +792,7 @@ export async function savePressAction(
         entityId: data.id,
         summary: `보도 등록: ${payload.title}`,
       });
+      revalidatePath(`/activities/press/${data.id}`);
     }
     revalidatePath("/");
     revalidatePath("/activities/press");
@@ -560,6 +821,172 @@ export async function deletePressAction(formData: FormData) {
   revalidatePath("/activities/press");
   revalidatePath("/admin/press");
   redirect(adminPath("/press"));
+}
+
+const NOTICE_HOME_MAX = 5;
+
+/** 공지사항 목록 — 메인 노출 일괄 반영 */
+export async function applyNoticeHomeAction(
+  formData: FormData,
+): Promise<AdminFormActionState> {
+  try {
+    const session = await requireAdminSession();
+    const ids = formData
+      .getAll("ids")
+      .map((v) => sanitizePlainLine(String(v), 80))
+      .filter(Boolean);
+    if (ids.length > NOTICE_HOME_MAX) {
+      return fail(`메인 노출은 최대 ${NOTICE_HOME_MAX}건까지 가능합니다.`);
+    }
+    const sb = createServiceClient();
+    const { error: clearErr } = await sb
+      .from("notices")
+      .update({ show_on_home: false, updated_at: new Date().toISOString() })
+      .neq("id", "00000000-0000-0000-0000-000000000000");
+    if (clearErr) return fail(clearErr.message);
+    if (ids.length) {
+      const { error } = await sb
+        .from("notices")
+        .update({ show_on_home: true, updated_at: new Date().toISOString() })
+        .in("id", ids);
+      if (error) return fail(error.message);
+    }
+    await writeAuditLog({
+      adminUsername: session.username,
+      action: "update",
+      entityType: "notices",
+      summary: `공지 메인 노출 반영: ${ids.length}건`,
+    });
+    revalidatePath("/");
+    revalidatePath("/activities/notices");
+    revalidatePath("/admin/notices");
+    return {};
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "반영에 실패했습니다.");
+  }
+}
+
+/** 공지사항 목록 — 상단 고정 일괄 반영 */
+export async function applyNoticePinAction(
+  formData: FormData,
+): Promise<AdminFormActionState> {
+  try {
+    const session = await requireAdminSession();
+    const ids = formData
+      .getAll("ids")
+      .map((v) => sanitizePlainLine(String(v), 80))
+      .filter(Boolean);
+    const sb = createServiceClient();
+    const { error: clearErr } = await sb
+      .from("notices")
+      .update({ is_pinned: false, updated_at: new Date().toISOString() })
+      .neq("id", "00000000-0000-0000-0000-000000000000");
+    if (clearErr) return fail(clearErr.message);
+    if (ids.length) {
+      const { error } = await sb
+        .from("notices")
+        .update({ is_pinned: true, updated_at: new Date().toISOString() })
+        .in("id", ids);
+      if (error) return fail(error.message);
+    }
+    await writeAuditLog({
+      adminUsername: session.username,
+      action: "update",
+      entityType: "notices",
+      summary: `공지 상단 고정 반영: ${ids.length}건`,
+    });
+    revalidatePath("/");
+    revalidatePath("/activities/notices");
+    revalidatePath("/admin/notices");
+    return {};
+  } catch (e) {
+    return fail(e instanceof Error ? e.message : "반영에 실패했습니다.");
+  }
+}
+
+export async function saveNoticeAction(
+  _prev: AdminFormActionState,
+  formData: FormData,
+): Promise<AdminFormActionState> {
+  try {
+    const session = await requireAdminSession();
+    const title = requireLine(
+      str(formData, "title"),
+      "제목",
+      "field-title",
+      ADMIN_LIMITS.notice.title,
+    );
+    if (!title.ok) return title.state;
+    const bodyHtml = requireRichHtml(
+      str(formData, "body_html"),
+      "본문",
+      "field-body",
+      ADMIN_LIMITS.notice.bodyHtml,
+    );
+    if (!bodyHtml.ok) return bodyHtml.state;
+
+    const id = sanitizePlainLine(str(formData, "id"), 80);
+    const payload = {
+      title: title.value,
+      body_html: bodyHtml.value,
+      is_published: publishedFromForm(formData),
+      updated_at: new Date().toISOString(),
+    };
+    const sb = createServiceClient();
+    if (id) {
+      const { error } = await sb.from("notices").update(payload).eq("id", id);
+      if (error) return fail(error.message);
+      await writeAuditLog({
+        adminUsername: session.username,
+        action: "update",
+        entityType: "notices",
+        entityId: id,
+        summary: `공지 수정: ${payload.title}`,
+      });
+      revalidatePath(`/activities/notices/${id}`);
+    } else {
+      const { data, error } = await sb
+        .from("notices")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error) return fail(error.message);
+      await writeAuditLog({
+        adminUsername: session.username,
+        action: "create",
+        entityType: "notices",
+        entityId: data.id,
+        summary: `공지 등록: ${payload.title}`,
+      });
+      revalidatePath(`/activities/notices/${data.id}`);
+    }
+    revalidatePath("/");
+    revalidatePath("/activities/notices");
+    revalidatePath("/admin/notices");
+    redirect(adminPath("/notices"));
+  } catch (e) {
+    if (isNextRedirect(e)) throw e;
+    return fail(e instanceof Error ? e.message : "저장에 실패했습니다.");
+  }
+}
+
+export async function deleteNoticeAction(formData: FormData) {
+  const session = await requireAdminSession();
+  const id = sanitizePlainLine(str(formData, "id"), 80);
+  const sb = createServiceClient();
+  const { error } = await sb.from("notices").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  await writeAuditLog({
+    adminUsername: session.username,
+    action: "delete",
+    entityType: "notices",
+    entityId: id,
+    summary: "공지 삭제",
+  });
+  revalidatePath("/");
+  revalidatePath("/activities/notices");
+  revalidatePath("/admin/notices");
+  redirect(adminPath("/notices"));
 }
 
 export async function saveMusicianAction(
@@ -594,8 +1021,6 @@ export async function saveMusicianAction(
     if (!instrument.ok) return instrument.state;
     const role = optionalLine(str(formData, "role"), "역할", "field-role", ADMIN_LIMITS.musician.role);
     if (!role.ok) return role.state;
-    const sort = parseSortOrder(str(formData, "sort_order"));
-    if (!sort.ok) return sort.state;
 
     const id = sanitizePlainLine(str(formData, "id"), 80);
     const sb = createServiceClient();
@@ -611,8 +1036,7 @@ export async function saveMusicianAction(
       section_name: section.value,
       role: role.value,
       photo_path: photoPath,
-      sort_order: sort.value,
-      is_published: bool(formData, "is_published"),
+      is_published: publishedFromForm(formData),
       updated_at: new Date().toISOString(),
     };
     if (id) {
@@ -649,8 +1073,14 @@ export async function deleteMusicianAction(formData: FormData) {
   const session = await requireAdminSession();
   const id = sanitizePlainLine(str(formData, "id"), 80);
   const sb = createServiceClient();
+  const { data: row } = await sb
+    .from("musicians")
+    .select("photo_path")
+    .eq("id", id)
+    .maybeSingle();
   const { error } = await sb.from("musicians").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await removeAdminImage(row?.photo_path as string | null);
   await writeAuditLog({
     adminUsername: session.username,
     action: "delete",
@@ -683,15 +1113,12 @@ export async function saveFaqAction(
       ADMIN_LIMITS.faq.answer,
     );
     if (!answer.ok) return answer.state;
-    const sort = parseSortOrder(str(formData, "sort_order"));
-    if (!sort.ok) return sort.state;
 
     const id = sanitizePlainLine(str(formData, "id"), 80);
     const payload = {
       question: question.value,
       answer: answer.value,
-      sort_order: sort.value,
-      is_published: bool(formData, "is_published"),
+      is_published: publishedFromForm(formData),
       updated_at: new Date().toISOString(),
     };
     const sb = createServiceClient();

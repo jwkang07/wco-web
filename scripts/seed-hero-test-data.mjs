@@ -35,68 +35,67 @@ const SECTIONS = [
   { key: "contact", label: "공연문의" },
 ];
 
-/** 공개 폴더 이미지 — Storage 업로드 없이 테스트 가능 */
-const IMAGES = [
-  "/images/hero/hero-main.png",
-  "/images/hero/hero-about.png",
-  "/images/photos/photo-concert.png",
-  "/images/photos/photo-rehearsal.png",
-  "/images/photos/photo-musicians.png",
-];
+/** 메뉴별로 서로 다른 이미지 — 게시 전환 시 육안으로 구분 */
+const TEST_IMAGES = {
+  home: ["/images/hero/hero-about.png", "/images/photos/photo-concert.png"],
+  about: ["/images/photos/photo-rehearsal.png", "/images/photos/photo-musicians.png"],
+  activities: ["/images/hero/hero-main.png", "/images/photos/photo-concert.png"],
+  musicians: ["/images/hero/hero-main.png", "/images/photos/photo-rehearsal.png"],
+  employment: ["/images/hero/hero-about.png", "/images/photos/photo-concert.png"],
+  contact: ["/images/hero/hero-about.png", "/images/photos/photo-musicians.png"],
+};
 
 async function main() {
   const { data: existing, error: listErr } = await sb
     .from("page_heroes")
-    .select("id, section_key, title, is_published, is_selected");
+    .select("id, section_key, title, is_published, is_selected, sort_order");
   if (listErr) throw listErr;
-  console.log("before:", existing?.length ?? 0, "rows");
+
+  console.log("before:", existing?.length ?? 0, "rows (기존 유지)");
 
   const rows = [];
-  let img = 0;
   for (const section of SECTIONS) {
+    const mine = (existing ?? []).filter((r) => r.section_key === section.key);
+    const maxSort = mine.reduce((m, r) => Math.max(m, Number(r.sort_order) || 0), 0);
+    const images = TEST_IMAGES[section.key];
+
     for (let n = 1; n <= 2; n += 1) {
-      const publishFirst = n === 1;
       rows.push({
         section_key: section.key,
         title: `[테스트] ${section.label} 비주얼 ${n}`,
-        description: `${section.label} 상단비주얼 테스트 설명 ${n}번입니다.`,
-        image_path: IMAGES[img % IMAGES.length],
+        description: `${section.label} 상단비주얼 게시 전환 테스트 ${n}번입니다.`,
+        image_path: images[n - 1],
         image_alt: `${section.label} 테스트 이미지 ${n}`,
-        is_published: publishFirst,
-        is_selected: publishFirst,
-        sort_order: n,
-        updated_at: new Date().toISOString(),
-      });
-      img += 1;
-    }
-  }
-
-  // 메뉴별로 기존 게시·선정 해제 후 테스트 행 추가 (기존 데이터는 유지하되 충돌 방지)
-  for (const section of SECTIONS) {
-    const { error: clearErr } = await sb
-      .from("page_heroes")
-      .update({
+        // 기존 게시건 유지 — 추가분은 비게시로 넣어 게시 전환 테스트용
         is_published: false,
         is_selected: false,
+        sort_order: maxSort + n,
         updated_at: new Date().toISOString(),
-      })
-      .eq("section_key", section.key);
-    if (clearErr) throw clearErr;
+      });
+    }
   }
 
   const { data: inserted, error } = await sb
     .from("page_heroes")
     .insert(rows)
-    .select("id, section_key, title, is_published, is_selected");
+    .select("id, section_key, title, is_published, image_path");
   if (error) throw error;
 
-  console.log("inserted:", inserted.length);
+  console.log("inserted:", inserted.length, "(모두 비게시)");
+
+  const { data: after } = await sb
+    .from("page_heroes")
+    .select("section_key, title, is_published, is_selected, image_path, sort_order")
+    .order("section_key")
+    .order("sort_order");
+
   for (const section of SECTIONS) {
-    const mine = inserted.filter((r) => r.section_key === section.key);
-    console.log(
-      section.key,
-      mine.map((r) => `${r.title}(게시=${r.is_published})`).join(" | "),
-    );
+    const mine = (after ?? []).filter((r) => r.section_key === section.key);
+    console.log(`\n[${section.label}] ${mine.length}건`);
+    for (const r of mine) {
+      const flag = r.is_published ? "게시" : "비게시";
+      console.log(`  ${flag.padEnd(4)} ${r.title} → ${r.image_path}`);
+    }
   }
 }
 

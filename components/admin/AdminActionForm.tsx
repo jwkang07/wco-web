@@ -16,6 +16,7 @@ import {
   ADMIN_IMAGE_MESSAGE,
   isAllowedAdminImage,
 } from "@/lib/sanitize";
+import { isEmptyRichHtml } from "@/lib/sanitize-html";
 
 export type AdminFormActionState = {
   error?: string;
@@ -31,6 +32,8 @@ export type AdminFieldRule = {
   maxLength?: number;
   /** file input — 이미지 MIME 검사 */
   imageFile?: boolean;
+  /** TipTap 등 리치 HTML — 빈 태그(<p></p>)도 미입력으로 처리 */
+  richHtml?: boolean;
 };
 
 type Props = {
@@ -81,7 +84,8 @@ function validateFields(
     }
 
     const value = typeof raw === "string" ? raw.trim() : "";
-    if (rule.required && !value) {
+    const empty = rule.richHtml ? isEmptyRichHtml(value) : !value;
+    if (rule.required && empty) {
       failAdminField(
         setFeedback,
         rule.fieldId,

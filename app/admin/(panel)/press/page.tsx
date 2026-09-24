@@ -1,54 +1,70 @@
 import { adminPath } from "@/lib/admin-path";
 import {
-  AdminBoardListClient,
-  type AdminBoardColumnDef,
-  type AdminBoardRow,
-} from "@/components/admin/AdminBoardListClient";
+  PressListClient,
+  type PressListItem,
+} from "@/components/admin/PressListClient";
 import { createServiceClient } from "@/lib/supabase/admin";
 
-const COLUMNS: AdminBoardColumnDef[] = [
-  { key: "date", header: "날짜", width: "7rem", align: "center" },
-  { key: "title", header: "제목", link: true },
-  { key: "home", header: "홈", width: "4rem", align: "center" },
-  { key: "published", header: "게시", width: "5rem", align: "center" },
-];
+function formatCreatedAt(raw: string | null | undefined) {
+  const v = String(raw ?? "").trim();
+  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}.${m[2]}.${m[3]}`;
+  return "";
+}
 
 export default async function AdminPressPage() {
-  let items: AdminBoardRow[] = [];
+  let items: PressListItem[] = [];
   let loadError: string | undefined;
   try {
     const sb = createServiceClient();
-    const { data, error } = await sb
+    let data: Record<string, unknown>[] | null = null;
+    const full = await sb
       .from("press_articles")
-      .select("id, title, source, published_on, show_on_home, is_published")
-      .order("published_on", { ascending: false });
-    if (error) loadError = error.message;
+      .select(
+        "id, title, source, show_on_home, is_pinned, is_published, view_count, created_at",
+      )
+      .order("is_pinned", { ascending: false })
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false });
+    if (full.error) {
+      const msg = full.error.message || "";
+      if (msg.includes("view_count") || msg.includes("is_pinned")) {
+        const fallback = await sb
+          .from("press_articles")
+          .select(
+            "id, title, source, show_on_home, is_published, created_at",
+          )
+          .order("created_at", { ascending: false })
+          .order("id", { ascending: false });
+        if (fallback.error) loadError = fallback.error.message;
+        data = (fallback.data as Record<string, unknown>[] | null) ?? [];
+      } else {
+        loadError = msg;
+      }
+    } else {
+      data = (full.data as Record<string, unknown>[] | null) ?? [];
+    }
     items = (data ?? []).map((row) => ({
       id: String(row.id),
-      href: `/admin/press/${row.id}`,
+      title: String(row.title ?? ""),
+      source: String(row.source ?? ""),
+      showOnHome: Boolean(row.show_on_home),
+      isPinned: Boolean(row.is_pinned),
+      isPublished: Boolean(row.is_published),
+      viewCount: Number(row.view_count ?? 0) || 0,
+      createdAt: String(row.created_at ?? ""),
+      createdAtLabel: formatCreatedAt(row.created_at as string | null),
       searchText: `${row.title ?? ""} ${row.source ?? ""}`,
-      published: Boolean(row.is_published),
-      cells: {
-        date: String(row.published_on || "-"),
-        title: String(row.title ?? ""),
-        home: row.show_on_home ? "Y" : "-",
-        published: row.is_published ? "게시" : "비게시",
-      },
     }));
   } catch (e) {
     loadError = e instanceof Error ? e.message : "unknown";
   }
 
   return (
-    <AdminBoardListClient
-      title="보도자료"
-      description="홈 보도 노출은 ‘홈’ 열에서 확인합니다."
-      noun="보도자료"
+    <PressListClient
       items={items}
       loadError={loadError}
       registerHref={adminPath("/press/new")}
-      searchPlaceholder="제목·출처"
-      columns={COLUMNS}
     />
   );
 }

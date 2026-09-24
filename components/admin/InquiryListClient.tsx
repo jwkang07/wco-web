@@ -29,6 +29,13 @@ const statusLabel: Record<string, string> = {
   done: "완료",
 };
 
+function formatCreatedAt(raw: string) {
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return "-";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
 type StatusFilter = "all" | "received" | "in_progress" | "done";
 
 export function InquiryListClient({
@@ -148,17 +155,17 @@ export function InquiryListClient({
         className="overflow-hidden rounded-xl border border-black/10 bg-white"
       >
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px] table-fixed border-collapse text-sm">
+          <table className="w-full min-w-[56rem] table-fixed border-collapse text-sm">
             <caption className="sr-only">
               문의 목록. 총 {paged.total}건. 페이지당 {ADMIN_LIST_PAGE_SIZE}건.
             </caption>
             <colgroup>
-              <col className="w-14" />
-              <col className="w-28" />
-              <col className="w-24" />
+              <col style={{ width: "3.5rem" }} />
+              <col style={{ width: "7rem" }} />
+              <col style={{ width: "7rem" }} />
               <col />
-              <col className="w-[9.5rem]" />
-              <col className="w-20" />
+              <col style={{ width: "11.5rem" }} />
+              <col style={{ width: "5rem" }} />
             </colgroup>
             <thead>
               <tr className="border-b border-black/10 bg-black/[0.03]">
@@ -166,7 +173,9 @@ export function InquiryListClient({
                 <th className="px-3 py-3 text-left font-semibold">이름</th>
                 <th className="px-3 py-3 text-left font-semibold">기관</th>
                 <th className="px-3 py-3 text-left font-semibold">이메일</th>
-                <th className="px-3 py-3 text-left font-semibold">등록일시</th>
+                <th className="whitespace-nowrap px-3 py-3 text-left font-semibold">
+                  등록일시
+                </th>
                 <th className="px-3 py-3 text-center font-semibold">상태</th>
               </tr>
             </thead>
@@ -201,8 +210,8 @@ export function InquiryListClient({
                         {item.organization || "-"}
                       </td>
                       <td className="h-12 truncate px-3">{item.email}</td>
-                      <td className="h-12 truncate px-3 text-[#6B6B6B]">
-                        {new Date(item.created_at).toLocaleString("ko-KR")}
+                      <td className="h-12 whitespace-nowrap px-3 tabular-nums text-[#6B6B6B]">
+                        {formatCreatedAt(item.created_at)}
                       </td>
                       <td className="h-12 px-3 text-center">
                         {statusLabel[item.status] ?? item.status}

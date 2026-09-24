@@ -27,7 +27,7 @@ create table if not exists public.admin_audit_logs (
 create index if not exists admin_audit_logs_created_at_idx
   on public.admin_audit_logs (created_at desc);
 
--- 히어로 (홈 + 메뉴별) — 메뉴당 여러 비주얼, is_selected 1건이 공개 노출
+-- 히어로 (홈 + 메뉴별) — 메뉴당 게시(is_published) 1건이 공개 노출
 create table if not exists public.page_heroes (
   id uuid primary key default gen_random_uuid(),
   section_key text not null,
@@ -35,7 +35,6 @@ create table if not exists public.page_heroes (
   description text not null default '',
   image_path text,
   image_alt text not null default '',
-  is_selected boolean not null default false,
   is_published boolean not null default true,
   sort_order int not null default 0,
   created_at timestamptz not null default now(),
@@ -61,9 +60,12 @@ create table if not exists public.performances (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   caption text not null default '',
+  body_html text not null default '',
   year text not null default '',
   image_path text,
   show_on_home boolean not null default false,
+  is_pinned boolean not null default false,
+  view_count int not null default 0,
   sort_order int not null default 0,
   is_published boolean not null default true,
   created_at timestamptz not null default now(),
@@ -71,15 +73,20 @@ create table if not exists public.performances (
 );
 create index if not exists performances_home_idx
   on public.performances (show_on_home, sort_order);
+create index if not exists performances_list_idx
+  on public.performances (is_pinned desc, created_at desc);
 
 -- 보도자료
 create table if not exists public.press_articles (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   source text not null default '',
+  body_html text not null default '',
   published_on date,
   href text not null default '#',
   show_on_home boolean not null default false,
+  is_pinned boolean not null default false,
+  view_count int not null default 0,
   sort_order int not null default 0,
   is_published boolean not null default true,
   created_at timestamptz not null default now(),
@@ -87,6 +94,25 @@ create table if not exists public.press_articles (
 );
 create index if not exists press_home_idx
   on public.press_articles (show_on_home, published_on desc nulls last);
+create index if not exists press_list_idx
+  on public.press_articles (is_pinned desc, created_at desc);
+
+-- 공지사항
+create table if not exists public.notices (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  body_html text not null default '',
+  show_on_home boolean not null default false,
+  is_pinned boolean not null default false,
+  view_count int not null default 0,
+  is_published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists notices_list_idx
+  on public.notices (is_pinned desc, created_at desc);
+create index if not exists notices_home_idx
+  on public.notices (show_on_home, created_at desc);
 
 -- 단원
 create table if not exists public.musicians (
@@ -144,6 +170,7 @@ alter table public.page_heroes enable row level security;
 alter table public.histories enable row level security;
 alter table public.performances enable row level security;
 alter table public.press_articles enable row level security;
+alter table public.notices enable row level security;
 alter table public.musicians enable row level security;
 alter table public.faqs enable row level security;
 alter table public.inquiries enable row level security;
@@ -156,8 +183,8 @@ values
   ('musicians', 'musicians', true, 10485760, array['image/jpeg','image/png','image/webp'])
 on conflict (id) do nothing;
 
--- 시드: 히어로 (메뉴당 1건 선정)
-insert into public.page_heroes (section_key, title, description, image_path, image_alt, is_selected, sort_order)
+-- 시드: 히어로 (메뉴당 1건 게시)
+insert into public.page_heroes (section_key, title, description, image_path, image_alt, is_published, sort_order)
 select * from (values
   ('home', '음악으로 세상과 만나는, 우리챔버오케스트라', '은평구립우리장애인복지관 문화일자리와 기업연계형 일자리로 구성되어 있습니다.', '/images/hero/hero-main.png', '우리챔버오케스트라 정기연주회 무대 전경', true, 1),
   ('about', '우리챔버오케스트라', '', '/images/hero/hero-about.png', '우리챔버오케스트라 정기연주회 무대 전경', true, 1),
@@ -165,7 +192,7 @@ select * from (values
   ('musicians', '우리단원', '', '/images/photos/photo-musicians.png', '우리챔버오케스트라 단원 연주 장면', true, 1),
   ('employment', '기업고용연계', '', '/images/photos/photo-rehearsal.png', '우리챔버오케스트라 연습 및 협연 장면', true, 1),
   ('contact', '공연문의', '', '/images/photos/photo-concert.png', '우리챔버오케스트라 공연 무대', true, 1)
-) as v(section_key, title, description, image_path, image_alt, is_selected, sort_order)
+) as v(section_key, title, description, image_path, image_alt, is_published, sort_order)
 where not exists (select 1 from public.page_heroes limit 1);
 
 -- 시드: 히스토리

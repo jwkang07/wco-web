@@ -1,51 +1,47 @@
-import {
-  AdminBoardListClient,
-  type AdminBoardColumnDef,
-  type AdminBoardRow,
-} from "@/components/admin/AdminBoardListClient";
 import { adminPath } from "@/lib/admin-path";
+import {
+  HistoryListClient,
+  type HistoryListItem,
+} from "@/components/admin/HistoryListClient";
 import { createServiceClient } from "@/lib/supabase/admin";
 
-const COLUMNS: AdminBoardColumnDef[] = [
-  { key: "year", header: "연도", width: "5rem", align: "center", link: true },
-  { key: "body", header: "내용" },
-  { key: "published", header: "게시", width: "5rem", align: "center" },
-];
+function formatCreatedAt(raw: string | null | undefined) {
+  const v = String(raw ?? "").trim();
+  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}.${m[2]}.${m[3]}`;
+  return "";
+}
 
 export default async function AdminHistoriesPage() {
-  let items: AdminBoardRow[] = [];
+  let items: HistoryListItem[] = [];
   let loadError: string | undefined;
   try {
     const sb = createServiceClient();
     const { data, error } = await sb
       .from("histories")
-      .select("id, year, body, is_published, sort_order")
-      .order("sort_order");
+      .select("id, year, body, sort_order, is_published, created_at")
+      .order("sort_order", { ascending: true })
+      .order("year", { ascending: true })
+      .order("id", { ascending: true });
     if (error) loadError = error.message;
     items = (data ?? []).map((row) => ({
       id: String(row.id),
-      href: adminPath(`/histories/${row.id}`),
+      year: String(row.year ?? ""),
+      body: String(row.body ?? ""),
+      sortOrder: Number(row.sort_order ?? 0) || 0,
+      isPublished: Boolean(row.is_published),
+      createdAtLabel: formatCreatedAt(row.created_at as string | null),
       searchText: `${row.year ?? ""} ${row.body ?? ""}`,
-      published: Boolean(row.is_published),
-      cells: {
-        year: String(row.year ?? ""),
-        body: String(row.body ?? ""),
-        published: row.is_published ? "게시" : "비게시",
-      },
     }));
   } catch (e) {
     loadError = e instanceof Error ? e.message : "unknown";
   }
 
   return (
-    <AdminBoardListClient
-      title="히스토리"
-      noun="히스토리"
+    <HistoryListClient
       items={items}
       loadError={loadError}
       registerHref={adminPath("/histories/new")}
-      searchPlaceholder="연도·내용"
-      columns={COLUMNS}
     />
   );
 }

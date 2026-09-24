@@ -12,7 +12,7 @@ import {
   AdminFormFields,
   AdminFormRow,
   AdminPageHeader,
-  adminCheckClassName,
+  AdminPublishRadios,
   fieldClassName,
   labelClassName,
 } from "@/components/admin/AdminUi";
@@ -33,6 +33,7 @@ export default async function AdminHeroEditPage({
   if (!isKnownHeroSection(section)) notFound();
 
   const isNew = id === "new";
+  const isHome = section === "home";
   const label = heroSectionLabel(section);
   let row: Record<string, unknown> | null = null;
 
@@ -50,12 +51,64 @@ export default async function AdminHeroEditPage({
 
   const image = getSupabasePublicUrl(row?.image_path as string | null);
   const listHref = heroAdminListPath(section);
+  const imageTitleDefault = isHome
+    ? String(row?.image_alt ?? "")
+    : String(row?.image_alt || row?.title || "");
+
+  const focusFields = isHome
+    ? [
+        {
+          name: "title",
+          fieldId: "field-title",
+          label: "제목",
+          maxLength: ADMIN_LIMITS.hero.title,
+        },
+        {
+          name: "description",
+          fieldId: "field-description",
+          label: "설명",
+          maxLength: ADMIN_LIMITS.hero.description,
+        },
+        {
+          name: "image_alt",
+          fieldId: "field-image-alt",
+          label: "이미지 대체 텍스트",
+          maxLength: ADMIN_LIMITS.hero.imageAlt,
+        },
+        {
+          name: "image",
+          fieldId: "field-image",
+          label: "이미지",
+          imageFile: true,
+          required: isNew,
+        },
+      ]
+    : [
+        {
+          name: "image_alt",
+          fieldId: "field-image-alt",
+          label: "이미지제목",
+          maxLength: ADMIN_LIMITS.hero.imageAlt,
+          required: true,
+        },
+        {
+          name: "image",
+          fieldId: "field-image",
+          label: "이미지",
+          imageFile: true,
+          required: isNew,
+        },
+      ];
 
   return (
     <div>
       <AdminPageHeader
         title={isNew ? `${label} 상단비주얼 등록` : `${label} 상단비주얼 수정`}
-        description="「게시」로 저장하면 바로 공개되고, 「비게시」로 저장하면 숨깁니다. 이 메뉴에 다른 게시 건이 있으면 자동으로 비게시됩니다."
+        description={
+          isHome
+            ? "이미지·제목·설명을 저장하고 「게시」하면 홈 메인비주얼에 바로 반영됩니다."
+            : "이미지와 이미지제목만 등록합니다. 「게시」로 저장하면 바로 공개되고, 이 메뉴의 다른 게시 건은 자동으로 비게시됩니다."
+        }
       />
       <AdminFormCard>
         <AdminActionForm
@@ -63,33 +116,7 @@ export default async function AdminHeroEditPage({
           encType="multipart/form-data"
           confirmNoun="상단비주얼"
           confirmMode={isNew ? "create" : "edit"}
-          fields={[
-            {
-              name: "title",
-              fieldId: "field-title",
-              label: "제목",
-              maxLength: ADMIN_LIMITS.hero.title,
-            },
-            {
-              name: "description",
-              fieldId: "field-description",
-              label: "설명",
-              maxLength: ADMIN_LIMITS.hero.description,
-            },
-            {
-              name: "image_alt",
-              fieldId: "field-image-alt",
-              label: "이미지 대체 텍스트",
-              maxLength: ADMIN_LIMITS.hero.imageAlt,
-            },
-            {
-              name: "image",
-              fieldId: "field-image",
-              label: "이미지",
-              imageFile: true,
-              required: isNew,
-            },
-          ]}
+          fields={focusFields}
         >
           {!isNew ? <input type="hidden" name="id" value={id} /> : null}
           <input type="hidden" name="section_key" value={section} />
@@ -102,64 +129,86 @@ export default async function AdminHeroEditPage({
             </AdminFormRow>
             {image ? (
               <AdminFormRow>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={image}
-                  alt=""
-                  className="h-40 w-full max-w-2xl rounded object-cover"
-                />
+                <p className="mb-1.5 text-xs text-[#6B6B6B]">
+                  공개 화면과 같은 비율 미리보기 (가운데 기준)
+                </p>
+                <div className="relative h-40 w-full max-w-2xl overflow-hidden rounded bg-[#262626]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={image}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                  />
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-[#262626]/72 via-[#262626]/52 to-[#262626]/28"
+                    aria-hidden
+                  />
+                </div>
               </AdminFormRow>
             ) : null}
-            <AdminFormRow>
-              <label className={labelClassName()} id="field-title">
-                제목/텍스트
-                <input
-                  name="title"
-                  data-admin-focus
-                  maxLength={ADMIN_LIMITS.hero.title}
-                  defaultValue={String(row?.title ?? "")}
-                  className={fieldClassName()}
-                />
-              </label>
-            </AdminFormRow>
-            <AdminFormRow>
-              <label className={labelClassName()} id="field-description">
-                설명
-                <textarea
-                  name="description"
-                  rows={3}
-                  data-admin-focus
-                  maxLength={ADMIN_LIMITS.hero.description}
-                  defaultValue={String(row?.description ?? "")}
-                  className={fieldClassName()}
-                />
-              </label>
-            </AdminFormRow>
-            <AdminFormRow>
-              <label className={labelClassName()} id="field-image-alt">
-                이미지 대체 텍스트
-                <input
-                  name="image_alt"
-                  data-admin-focus
-                  maxLength={ADMIN_LIMITS.hero.imageAlt}
-                  defaultValue={String(row?.image_alt ?? "")}
-                  className={fieldClassName()}
-                />
-              </label>
-            </AdminFormRow>
-            <AdminFormRow>
-              <label className={labelClassName()} id="field-sort">
-                정렬
-                <input
-                  name="sort_order"
-                  type="number"
-                  min={0}
-                  step={1}
-                  defaultValue={String(row?.sort_order ?? 0)}
-                  className={fieldClassName()}
-                />
-              </label>
-            </AdminFormRow>
+
+            {isHome ? (
+              <>
+                <AdminFormRow>
+                  <label className={labelClassName()} id="field-title">
+                    제목/텍스트
+                    <input
+                      name="title"
+                      data-admin-focus
+                      maxLength={ADMIN_LIMITS.hero.title}
+                      defaultValue={String(row?.title ?? "")}
+                      className={fieldClassName()}
+                    />
+                  </label>
+                </AdminFormRow>
+                <AdminFormRow>
+                  <label className={labelClassName()} id="field-description">
+                    설명
+                    <textarea
+                      name="description"
+                      rows={3}
+                      data-admin-focus
+                      maxLength={ADMIN_LIMITS.hero.description}
+                      defaultValue={String(row?.description ?? "")}
+                      className={fieldClassName()}
+                    />
+                  </label>
+                </AdminFormRow>
+                <AdminFormRow>
+                  <label className={labelClassName()} id="field-image-alt">
+                    이미지 대체 텍스트
+                    <input
+                      name="image_alt"
+                      data-admin-focus
+                      maxLength={ADMIN_LIMITS.hero.imageAlt}
+                      defaultValue={imageTitleDefault}
+                      className={fieldClassName()}
+                    />
+                  </label>
+                </AdminFormRow>
+              </>
+            ) : (
+              <AdminFormRow>
+                <label className={labelClassName()} id="field-image-alt">
+                  이미지제목{" "}
+                  <span className="text-red-600" aria-hidden>
+                    *
+                  </span>
+                  <input
+                    name="image_alt"
+                    data-admin-focus
+                    required
+                    maxLength={ADMIN_LIMITS.hero.imageAlt}
+                    defaultValue={imageTitleDefault}
+                    className={fieldClassName()}
+                  />
+                </label>
+                <p className="mt-1.5 text-xs text-[#6B6B6B]">
+                  관리자 목록에 표시되며, 접근성용 이미지 설명으로도 사용됩니다.
+                </p>
+              </AdminFormRow>
+            )}
+
             <AdminFormRow>
               <AdminFileButton
                 name="image"
@@ -179,17 +228,10 @@ export default async function AdminHeroEditPage({
               />
             </AdminFormRow>
             <AdminFormRow>
-              <label className={adminCheckClassName()}>
-                <input
-                  type="checkbox"
-                  name="is_published"
-                  defaultChecked={row ? Boolean(row.is_published) : true}
-                />
-                게시 (저장 즉시 공개 · 메뉴당 1건)
-              </label>
-              <p className="mt-1.5 text-xs text-[#6B6B6B]">
-                체크 해제 후 저장하면 비게시되어 공개 화면에서 사라집니다.
-              </p>
+              <AdminPublishRadios
+                defaultPublished={row ? Boolean(row.is_published) : true}
+                hint="게시로 저장하면 즉시 공개되고, 이 메뉴의 다른 건은 자동 비게시됩니다."
+              />
             </AdminFormRow>
           </AdminFormFields>
 

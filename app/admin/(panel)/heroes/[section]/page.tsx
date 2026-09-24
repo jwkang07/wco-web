@@ -22,20 +22,35 @@ export default async function AdminHeroSectionListPage({
     const sb = createServiceClient();
     const { data } = await sb
       .from("page_heroes")
-      .select("id, title, image_path, is_selected, is_published, updated_at, sort_order")
+      .select(
+        "id, title, image_alt, image_path, is_selected, is_published, created_at",
+      )
       .eq("section_key", section)
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: false });
-    items = (data ?? []).map((row) => ({
-      id: String(row.id),
-      title: String(row.title ?? ""),
-      imageUrl: getSupabasePublicUrl(row.image_path as string | null),
-      isSelected: Boolean(row.is_selected),
-      isPublished: row.is_published !== false,
-      updatedAt: row.updated_at
-        ? new Date(String(row.updated_at)).toLocaleDateString("ko-KR")
-        : "-",
-    }));
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false });
+    const isHome = section === "home";
+    items = (data ?? []).map((row) => {
+      const title = isHome
+        ? String(row.title ?? "")
+        : String(row.image_alt || row.title || "");
+      return {
+        id: String(row.id),
+        title,
+        imageUrl: getSupabasePublicUrl(row.image_path as string | null),
+        isSelected: Boolean(row.is_selected),
+        isPublished: row.is_published !== false,
+        updatedAt: row.created_at
+          ? new Date(String(row.created_at)).toLocaleDateString("ko-KR")
+          : "-",
+      };
+    });
+    // 게시 중인 건을 위에, 그 안에서는 등록일 최신순 유지
+    items.sort((a, b) => {
+      const liveA = a.isPublished ? 0 : 1;
+      const liveB = b.isPublished ? 0 : 1;
+      if (liveA !== liveB) return liveA - liveB;
+      return 0;
+    });
   } catch {
     items = [];
   }

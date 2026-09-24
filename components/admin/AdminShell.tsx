@@ -39,7 +39,10 @@ export function AdminShell({
                 ) ??
                   false);
               return (
-                <li key={item.href}>
+                <li
+                  key={item.href}
+                  className={item.spacedBefore ? "mt-3" : undefined}
+                >
                   <Link
                     href={item.href}
                     className={`block rounded px-3 py-2 text-sm transition ${

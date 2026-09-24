@@ -174,14 +174,18 @@ export function HeroSectionListClient({
                       <td className="h-16 px-3">
                         <Link
                           href={heroAdminEditPath(sectionKey, item.id)}
-                          className="mx-auto block h-12 w-[6.5rem] overflow-hidden rounded border border-black/10 bg-black/[0.03]"
+                          className={`mx-auto block h-12 w-[6.5rem] overflow-hidden rounded border bg-black/[0.03] ${
+                            isLive
+                              ? "border-[#5a554c] ring-1 ring-[#5a554c]/40"
+                              : "border-black/10 opacity-55"
+                          }`}
                         >
                           {item.imageUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={item.imageUrl}
                               alt=""
-                              className="h-full w-full object-cover"
+                              className="h-full w-full object-cover object-center"
                             />
                           ) : null}
                         </Link>

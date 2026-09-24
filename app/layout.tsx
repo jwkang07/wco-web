@@ -3,6 +3,7 @@ import { Noto_Sans_KR } from "next/font/google";
 import { absoluteUrl, getSiteUrl, organizationJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
+import { SuppressNativeValidationBubble } from "@/components/SuppressNativeValidationBubble";
 import "./globals.css";
 
 const notoSans = Noto_Sans_KR({
@@ -60,6 +61,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <JsonLd data={organizationJsonLd()} />
+        <SuppressNativeValidationBubble />
         {children}
       </body>
     </html>

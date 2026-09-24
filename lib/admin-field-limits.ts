@@ -16,11 +16,17 @@ export const ADMIN_LIMITS = {
     title: 120,
     caption: 200,
     year: 10,
+    bodyHtml: 50000,
   },
   press: {
     title: 200,
     source: 80,
     href: 500,
+    bodyHtml: 50000,
+  },
+  notice: {
+    title: 200,
+    bodyHtml: 50000,
   },
   musician: {
     name: 40,

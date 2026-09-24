@@ -117,3 +117,40 @@ export function fieldClassName() {
 export function adminCheckClassName() {
   return "flex items-center gap-2 text-sm text-[#262626]";
 }
+
+/** 게시 / 비게시 라디오 (name=is_published) */
+export function AdminPublishRadios({
+  defaultPublished = true,
+  hint,
+}: {
+  defaultPublished?: boolean;
+  hint?: string;
+}) {
+  return (
+    <fieldset>
+      <legend className={labelClassName()}>게시여부</legend>
+      <div className="mt-2 flex flex-wrap gap-6">
+        <label className={adminCheckClassName()}>
+          <input
+            type="radio"
+            name="is_published"
+            value="true"
+            defaultChecked={defaultPublished}
+          />
+          게시
+        </label>
+        <label className={adminCheckClassName()}>
+          <input
+            type="radio"
+            name="is_published"
+            value="false"
+            defaultChecked={!defaultPublished}
+          />
+          비게시
+        </label>
+      </div>
+      {hint ? <p className="mt-1.5 text-xs text-[#6B6B6B]">{hint}</p> : null}
+    </fieldset>
+  );
+}
+

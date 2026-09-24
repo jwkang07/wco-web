@@ -1,0 +1,60 @@
+import { readFileSync } from "fs";
+import pg from "pg";
+
+function loadEnv() {
+  const map = new Map();
+  for (const line of readFileSync(".env.local", "utf8").split(/\r?\n/)) {
+    const t = line.trim();
+    if (!t || t.startsWith("#") || !t.includes("=")) continue;
+    const i = t.indexOf("=");
+    let v = t.slice(i + 1).trim();
+    if (
+      (v.startsWith('"') && v.endsWith('"')) ||
+      (v.startsWith("'") && v.endsWith("'"))
+    ) {
+      v = v.slice(1, -1);
+    }
+    map.set(t.slice(0, i).trim(), v);
+  }
+  return map;
+}
+
+function pooler(databaseUrl) {
+  const u = new URL(databaseUrl);
+  const projectRef = u.hostname.startsWith("db.")
+    ? u.hostname.slice(3).split(".")[0]
+    : null;
+  return `postgresql://${decodeURIComponent(u.username)}.${projectRef}:${encodeURIComponent(decodeURIComponent(u.password))}@aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres`;
+}
+
+const env = loadEnv();
+const client = new pg.Client({
+  connectionString: pooler(env.get("DATABASE_URL")),
+  ssl: { rejectUnauthorized: false },
+});
+await client.connect();
+try {
+  await client.query(`
+    alter table public.performances
+      add column if not exists view_count int not null default 0;
+    alter table public.performances
+      add column if not exists is_pinned boolean not null default false;
+  `);
+  // PostgREST 스키마 캐시 갱신 (Supabase)
+  try {
+    await client.query(`notify pgrst, 'reload schema'`);
+  } catch {
+    /* ignore */
+  }
+  const { rows } = await client.query(`
+    select column_name, data_type, column_default
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'performances'
+      and column_name in ('view_count', 'is_pinned', 'body_html')
+    order by column_name
+  `);
+  console.log(rows);
+} finally {
+  await client.end();
+}
