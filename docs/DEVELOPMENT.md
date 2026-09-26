@@ -54,14 +54,17 @@ npm run lint
 Cursor · Codex · Antigravity(또는 터미널)가 **동시에** `npm run dev`를 실행하면 포트가 3000/3001로 갈라지고 메모리·응답이 나빠질 수 있다.
 **한 개의 개발 서버만** 사용한다. `scripts/dev-server.mjs`의 자동 재시작은 유지한다.
 
-포트·프로세스 확인(기본은 종료하지 않음):
+포트 점검·종료 (`scripts/kill-dev-ports.mjs`, Windows `netstat` 기반):
 
 ```bash
-node scripts/kill-dev-ports.mjs          # 점검만
-node scripts/kill-dev-ports.mjs --force  # 명시적 종료
+node scripts/kill-dev-ports.mjs                 # 점검만 (종료 안 함)
+node scripts/kill-dev-ports.mjs --force --port 3000
 ```
 
-사용자 프로세스를 임의로 자동 종료하는 동작을 넣지 말 것.
+- `--force`만으로는 종료하지 않는다. `--force`와 `--port 3000|3001`이 **함께** 있어야 한다.
+- `--force`는 **선택한 포트의 현재 LISTENING PID만** 대상으로 한다. 다른 Node 프로세스는 건드리지 않는다.
+- 자동 재시작 관리 프로세스(`dev-server.mjs` 등)는 추측 종료하지 않는다. **해당 서버를 실행한 터미널에서 직접 종료**하는 것이 원칙이다.
+- Cursor, Codex, Antigravity에서 개발 서버를 **동시에 실행하지 말 것**.
 
 ### 나무말미와 같은 원칙
 
