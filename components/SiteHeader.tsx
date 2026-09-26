@@ -136,6 +136,15 @@ export function SiteHeader() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLElement>(null);
 
+  // 경로 변경 시 메뉴 닫기 (렌더 중 조정 — set-state-in-effect 회피)
+  const [navPath, setNavPath] = useState(pathname);
+  if (navPath !== pathname) {
+    setNavPath(pathname);
+    setMenuOpen(false);
+    setMegaOpen(false);
+    setHoveredSection(null);
+  }
+
   const closeMegaMenu = useCallback(() => {
     setMegaOpen(false);
     setHoveredSection(null);
@@ -147,12 +156,6 @@ export function SiteHeader() {
       menuButtonRef.current?.focus();
     });
   }, []);
-
-  useEffect(() => {
-    setMenuOpen(false);
-    setMegaOpen(false);
-    setHoveredSection(null);
-  }, [pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;

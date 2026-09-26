@@ -151,31 +151,34 @@ export function ContactInquiryForm() {
   const [awaitingServer, setAwaitingServer] = useState(false);
   /** pending=true를 한 번이라도 본 뒤에만 결과를 반영 */
   const [sawPending, setSawPending] = useState(false);
+  const [resetTick, setResetTick] = useState(0);
   const errorSummaryId = "inquiry-error-summary";
 
   const activeFieldId = focusId ?? (state.fieldId as FieldId | undefined) ?? null;
 
-  useEffect(() => {
-    if (awaitingServer && pending) setSawPending(true);
-  }, [awaitingServer, pending]);
-
-  useEffect(() => {
-    if (!awaitingServer || pending || !sawPending) return;
+  // pending/결과 반영은 렌더 중 조정 (set-state-in-effect 회피). form reset만 effect.
+  if (awaitingServer && pending && !sawPending) {
+    setSawPending(true);
+  }
+  if (awaitingServer && !pending && sawPending) {
     setAwaitingServer(false);
     setSawPending(false);
     if (state.ok) {
-      formRef.current?.reset();
       setMessage(null);
       setFocusId(null);
       setSuccessVisible(true);
-      return;
-    }
-    if (state.error) {
+      setResetTick((n) => n + 1);
+    } else if (state.error) {
       setSuccessVisible(false);
       setMessage(state.error);
       setFocusId((state.fieldId as FieldId | undefined) ?? null);
     }
-  }, [awaitingServer, pending, sawPending, state]);
+  }
+
+  useEffect(() => {
+    if (resetTick === 0) return;
+    formRef.current?.reset();
+  }, [resetTick]);
 
   useEffect(() => {
     if (!focusId && !state.fieldId) return;

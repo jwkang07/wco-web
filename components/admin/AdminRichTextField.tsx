@@ -6,7 +6,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { isValidAdminLinkUrl } from "@/lib/sanitize";
 
 type Props = {
@@ -67,11 +67,6 @@ export function AdminRichTextField({
       },
     },
   });
-
-  useEffect(() => {
-    if (!editor) return;
-    setHtml(editor.isEmpty ? "" : editor.getHTML());
-  }, [editor]);
 
   function setLink() {
     if (!editor) return;

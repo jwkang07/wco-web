@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AdminEmptyTableRow } from "@/components/admin/AdminEmptyTableRow";
 import { AdminFormFeedback } from "@/components/admin/AdminFormFeedback";
@@ -65,13 +65,16 @@ export function NoticeListClient({ items, loadError, registerHref }: Props) {
   });
   const [page, setPage] = useState(1);
 
+  // 서버 데이터 갱신 시 체크 상태 동기화 (렌더 중 조정 — set-state-in-effect 회피)
   const itemsKey = items
     .map((i) => `${i.id}:${i.showOnHome}:${i.isPinned}`)
     .join("|");
-  useEffect(() => {
+  const [syncedKey, setSyncedKey] = useState(itemsKey);
+  if (syncedKey !== itemsKey) {
+    setSyncedKey(itemsKey);
     setHomeIds(new Set(items.filter((i) => i.showOnHome).map((i) => i.id)));
     setPinIds(new Set(items.filter((i) => i.isPinned).map((i) => i.id)));
-  }, [itemsKey, items]);
+  }
 
   const filtered = useMemo(() => {
     const q = compactSearchText(applied.keyword);

@@ -120,6 +120,7 @@ export function AdminActionForm({
 }: Props) {
   const [state, formAction, pending] = useActionState(action, initial);
   const [feedback, setFeedback] = useState<AdminFeedback | null>(null);
+  const [serverErrorKey, setServerErrorKey] = useState("");
 
   const legacyFields: AdminFieldRule[] = required.map((r) => ({
     name: r.name,
@@ -132,11 +133,17 @@ export function AdminActionForm({
 
   const allFields = fields.length ? fields : legacyFields;
 
+  // 서버 액션 오류 → 피드백 (렌더 중 조정). 포커스는 DOM 동기화만 effect.
+  const nextErrorKey = state.error
+    ? `${state.error}\0${state.fieldId ?? ""}`
+    : "";
+  if (nextErrorKey && nextErrorKey !== serverErrorKey) {
+    setServerErrorKey(nextErrorKey);
+    setFeedback({ tone: "error", message: state.error! });
+  }
+
   useEffect(() => {
-    if (state.error) {
-      setFeedback({ tone: "error", message: state.error });
-      if (state.fieldId) focusAdminField(state.fieldId);
-    }
+    if (state.error && state.fieldId) focusAdminField(state.fieldId);
   }, [state]);
 
   return (
