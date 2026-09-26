@@ -120,7 +120,10 @@ export function AdminActionForm({
 }: Props) {
   const [state, formAction, pending] = useActionState(action, initial);
   const [feedback, setFeedback] = useState<AdminFeedback | null>(null);
-  const [serverErrorKey, setServerErrorKey] = useState("");
+  /** 제출 라운드 — 동일 서버 오류도 매 제출마다 다시 표시 */
+  const [submitRound, setSubmitRound] = useState(0);
+  const [appliedRound, setAppliedRound] = useState(0);
+  const [sawPending, setSawPending] = useState(false);
 
   const legacyFields: AdminFieldRule[] = required.map((r) => ({
     name: r.name,
@@ -133,18 +136,27 @@ export function AdminActionForm({
 
   const allFields = fields.length ? fields : legacyFields;
 
-  // 서버 액션 오류 → 피드백 (렌더 중 조정). 포커스는 DOM 동기화만 effect.
-  const nextErrorKey = state.error
-    ? `${state.error}\0${state.fieldId ?? ""}`
-    : "";
-  if (nextErrorKey && nextErrorKey !== serverErrorKey) {
-    setServerErrorKey(nextErrorKey);
-    setFeedback({ tone: "error", message: state.error! });
+  // pending 시작/종료를 렌더 중 추적해, 같은 error 문자열이어도 재표시
+  if (pending && submitRound > appliedRound && !sawPending) {
+    setSawPending(true);
+  }
+  if (
+    !pending &&
+    sawPending &&
+    submitRound > appliedRound
+  ) {
+    setSawPending(false);
+    setAppliedRound(submitRound);
+    if (state.error) {
+      setFeedback({ tone: "error", message: state.error });
+    }
   }
 
   useEffect(() => {
-    if (state.error && state.fieldId) focusAdminField(state.fieldId);
-  }, [state]);
+    if (feedback?.tone === "error" && state.fieldId) {
+      focusAdminField(state.fieldId);
+    }
+  }, [feedback, state.fieldId, appliedRound]);
 
   return (
     <form
@@ -159,13 +171,16 @@ export function AdminActionForm({
           e.preventDefault();
           return;
         }
-        setFeedback(null);
         if (
           confirmNoun &&
           !window.confirm(adminConfirmSave(confirmNoun, confirmMode))
         ) {
           e.preventDefault();
+          return;
         }
+        setFeedback(null);
+        setSawPending(false);
+        setSubmitRound((n) => n + 1);
       }}
       data-admin-pending={pending ? "1" : "0"}
     >

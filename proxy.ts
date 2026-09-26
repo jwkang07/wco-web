@@ -17,6 +17,9 @@ const ADMIN_SECURITY_HEADERS: Record<string, string> = {
   "Cache-Control": "no-store, no-cache, must-revalidate, private",
 };
 
+/** rewrite → /admin 재진입 시 /wco-console 리다이렉트 루프 방지 */
+const INTERNAL_ADMIN_REWRITE = "x-wco-admin-internal";
+
 function withAdminHeaders(response: NextResponse) {
   for (const [key, value] of Object.entries(ADMIN_SECURITY_HEADERS)) {
     response.headers.set(key, value);
@@ -24,11 +27,29 @@ function withAdminHeaders(response: NextResponse) {
   return response;
 }
 
+function rewriteToInternal(request: NextRequest, pathname: string) {
+  const rewriteUrl = request.nextUrl.clone();
+  rewriteUrl.pathname = pathname;
+  const headers = new Headers(request.headers);
+  headers.set(INTERNAL_ADMIN_REWRITE, "1");
+  return withAdminHeaders(
+    NextResponse.rewrite(rewriteUrl, {
+      request: { headers },
+    }),
+  );
+}
+
 export async function proxy(request: NextRequest) {
+  // 공개 URL(/wco-console/…)을 /admin으로 rewrite한 뒤 proxy가 한 번 더 돌 때:
+  // 외부 /admin 리다이렉트로 다시 보내지 않고 통과시킨다.
+  if (request.headers.get(INTERNAL_ADMIN_REWRITE) === "1") {
+    return withAdminHeaders(NextResponse.next());
+  }
+
   const { pathname } = request.nextUrl;
   const adminBase = getAdminBasePath();
 
-  // 예전 /admin URL → 공개 경로로 보냄
+  // 예전 /admin URL → 공개 경로로 보냄 (브라우저가 직접 /admin을 친 경우만)
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     const url = request.nextUrl.clone();
     url.pathname = toPublicAdminPath(pathname);
@@ -49,22 +70,14 @@ export async function proxy(request: NextRequest) {
   const isLoginPage =
     internalAdmin === "/admin/login" || internalAdmin === "/admin";
 
-  const rewriteUrl = request.nextUrl.clone();
-  rewriteUrl.pathname = internalAdmin === "/admin" ? "/admin/login" : internalAdmin;
-
-  if (isLoginPage || internalAdmin === "/admin") {
+  if (isLoginPage) {
     if (session) {
       const url = request.nextUrl.clone();
       url.pathname = ADMIN_HOME_HREF;
       url.search = "";
       return withAdminHeaders(NextResponse.redirect(url));
     }
-    rewriteUrl.pathname = "/admin/login";
-    return withAdminHeaders(
-      NextResponse.rewrite(rewriteUrl, {
-        request: { headers: request.headers },
-      }),
-    );
+    return rewriteToInternal(request, "/admin/login");
   }
 
   if (!session) {
@@ -74,11 +87,7 @@ export async function proxy(request: NextRequest) {
     return withAdminHeaders(NextResponse.redirect(login));
   }
 
-  return withAdminHeaders(
-    NextResponse.rewrite(rewriteUrl, {
-      request: { headers: request.headers },
-    }),
-  );
+  return rewriteToInternal(request, internalAdmin);
 }
 
 export const config = {
