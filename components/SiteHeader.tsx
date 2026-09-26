@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FocusEvent,
+} from "react";
 import type { NavItem } from "@/lib/site";
 import { nav, navMaxSubItems } from "@/lib/site";
 import { SiteLogo } from "@/components/SiteLogo";
@@ -37,6 +44,7 @@ function MegaMenuColumn({
       <Link
         href={item.href}
         onClick={onMenuClose}
+        onFocus={() => onHoverSection(item.href)}
         className={`block whitespace-nowrap font-serif text-sm font-semibold leading-tight transition-colors ${
           sectionActive
             ? "text-wco-orange"
@@ -61,6 +69,7 @@ function MegaMenuColumn({
                   <Link
                     href={child.href}
                     onClick={onMenuClose}
+                    onFocus={() => onHoverSection(item.href)}
                     aria-current={childActive ? "page" : undefined}
                     className={`block rounded px-1 py-0.5 text-xs leading-snug transition-colors ${
                       childActive
@@ -101,6 +110,7 @@ function DesktopNavLink({
       href={item.href}
       aria-current={sectionActive ? "page" : undefined}
       onMouseEnter={() => onHoverSection(item.href)}
+      onFocus={() => onHoverSection(item.href)}
       onClick={onMenuClose}
       className={`inline-flex items-center px-2.5 py-2 text-sm font-semibold whitespace-nowrap transition-colors xl:px-3 xl:text-base ${
         sectionActive
@@ -120,12 +130,23 @@ export function SiteHeader() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const menuId = useId();
+  const megaPanelId = useId();
   const pathname = usePathname();
+  const desktopNavRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileNavRef = useRef<HTMLElement>(null);
 
-  const closeMegaMenu = () => {
+  const closeMegaMenu = useCallback(() => {
     setMegaOpen(false);
     setHoveredSection(null);
-  };
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    setMenuOpen(false);
+    requestAnimationFrame(() => {
+      menuButtonRef.current?.focus();
+    });
+  }, []);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -142,15 +163,83 @@ export function SiteHeader() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!megaOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMegaMenu();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [megaOpen, closeMegaMenu]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeMobileMenu();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen, closeMobileMenu]);
+
+  useEffect(() => {
+    if (!menuOpen || !mobileNavRef.current) return;
+    const first = mobileNavRef.current.querySelector<HTMLElement>(
+      'a[href], button:not([disabled])',
+    );
+    first?.focus();
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen || !mobileNavRef.current) return;
+
+    const navEl = mobileNavRef.current;
+    const focusables = () =>
+      Array.from(
+        navEl.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    navEl.addEventListener("keydown", onKeyDown);
+    return () => navEl.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
+
+  function handleDesktopBlur(e: FocusEvent<HTMLDivElement>) {
+    const next = e.relatedTarget as Node | null;
+    if (desktopNavRef.current?.contains(next)) return;
+    closeMegaMenu();
+  }
+
   return (
     <header className="sticky top-0 z-50 shrink-0 border-b border-wco-peach bg-white">
       <div className="container flex h-16 items-center justify-between gap-4 lg:h-[4.5rem]">
         <SiteLogo />
 
         <div
+          ref={desktopNavRef}
           className="relative hidden min-w-0 flex-1 lg:block"
           onMouseEnter={() => setMegaOpen(true)}
           onMouseLeave={closeMegaMenu}
+          onFocus={() => setMegaOpen(true)}
+          onBlur={handleDesktopBlur}
         >
           <nav
             aria-label="주 메뉴"
@@ -168,6 +257,8 @@ export function SiteHeader() {
           </nav>
 
           <div
+            id={megaPanelId}
+            aria-hidden={!megaOpen}
             className={`absolute top-full right-0 z-50 pt-1 transition-opacity duration-150 ${
               megaOpen
                 ? "visible pointer-events-auto opacity-100"
@@ -191,11 +282,15 @@ export function SiteHeader() {
         </div>
 
         <button
+          ref={menuButtonRef}
           type="button"
           className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-wco-peach text-wco-grey transition-colors hover:bg-wco-peach lg:hidden"
           aria-expanded={menuOpen}
           aria-controls={menuId}
-          onClick={() => setMenuOpen((open) => !open)}
+          onClick={() => {
+            if (menuOpen) closeMobileMenu();
+            else setMenuOpen(true);
+          }}
         >
           <span className="sr-only">{menuOpen ? "메뉴 닫기" : "메뉴 열기"}</span>
           {menuOpen ? (
@@ -230,9 +325,10 @@ export function SiteHeader() {
             type="button"
             aria-label="메뉴 닫기"
             className="fixed inset-0 z-40 bg-wco-grey/40 lg:hidden"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMobileMenu}
           />
           <nav
+            ref={mobileNavRef}
             id={menuId}
             aria-label="주 메뉴"
             className="fixed inset-x-0 top-16 z-50 max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-wco-peach bg-white px-4 py-5 lg:hidden"
@@ -250,7 +346,8 @@ export function SiteHeader() {
                   >
                     <Link
                       href={item.href}
-                      onClick={() => setMenuOpen(false)}
+                      onClick={closeMobileMenu}
+                      aria-current={sectionActive ? "page" : undefined}
                       className={`block font-serif text-base font-bold ${
                         sectionActive ? "text-wco-orange" : "text-wco-grey"
                       }`}
@@ -265,7 +362,7 @@ export function SiteHeader() {
                             <li key={child.href}>
                               <Link
                                 href={child.href}
-                                onClick={() => setMenuOpen(false)}
+                                onClick={closeMobileMenu}
                                 aria-current={childActive ? "page" : undefined}
                                 className={`block rounded-md px-3 py-2.5 text-sm ${
                                   childActive

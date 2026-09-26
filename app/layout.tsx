@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
     default: site.name,
+    // 공개는 (site)/layout absolute로 고정. 관리자는 admin/layout absolute 유지.
     template: `%s | ${site.name}`,
   },
   description: site.description,

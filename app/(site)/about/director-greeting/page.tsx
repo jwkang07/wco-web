@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { GreetingBlock } from "@/components/GreetingBlock";
 import { PageShell } from "@/components/PageShell";
 import { greetings } from "@/lib/content";
-import { nav } from "@/lib/site";
+import { nav, site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "관장 인삿말",
+  title: { absolute: site.name },
   description:
     "은평구립우리장애인복지관 관장의 우리챔버오케스트라 인삿말입니다.",
   alternates: { canonical: "/about/director-greeting" },

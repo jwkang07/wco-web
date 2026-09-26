@@ -2,6 +2,7 @@
 
 코드 구조·배포·개발 관행입니다. 나무말미는 동일 UI 복제가 아니라 **기능·패턴 참고**입니다.
 
+- **에이전트 공통:** [`../AGENTS.md`](../AGENTS.md) · [`AGENT_CONTEXT.md`](AGENT_CONTEXT.md) (CMS·스키마·메뉴 — Codex/Antigravity 포함)
 - **코딩 규칙:** [`CODING_RULES.md`](CODING_RULES.md) (공개/관리자 경계)
 - **공개 UI:** [`UI_GUIDE.md`](UI_GUIDE.md) · [`UI_BUTTON_GUIDE.md`](UI_BUTTON_GUIDE.md) · [`UI_UX_GUIDE.md`](UI_UX_GUIDE.md)
 - **관리자 UI:** [`ADMIN_UI_GUIDE.md`](ADMIN_UI_GUIDE.md) · [`ADMIN_UI_BUTTON_GUIDE.md`](ADMIN_UI_BUTTON_GUIDE.md) · [`ADMIN_UI_UX_GUIDE.md`](ADMIN_UI_UX_GUIDE.md)
@@ -47,6 +48,20 @@ npm run lint
 
 - `.env.local`은 **커밋 금지**
 - 배포: `git push origin main` 또는 `npx vercel deploy --prod`
+
+### 개발 서버는 1개만
+
+Cursor · Codex · Antigravity(또는 터미널)가 **동시에** `npm run dev`를 실행하면 포트가 3000/3001로 갈라지고 메모리·응답이 나빠질 수 있다.
+**한 개의 개발 서버만** 사용한다. `scripts/dev-server.mjs`의 자동 재시작은 유지한다.
+
+포트·프로세스 확인(기본은 종료하지 않음):
+
+```bash
+node scripts/kill-dev-ports.mjs          # 점검만
+node scripts/kill-dev-ports.mjs --force  # 명시적 종료
+```
+
+사용자 프로세스를 임의로 자동 종료하는 동작을 넣지 말 것.
 
 ### 나무말미와 같은 원칙
 
@@ -162,10 +177,28 @@ wco_web/
 
 ---
 
-## 10. 관련 문서
+## 10. 의존성 취약점 (기록 · 2026-09-26)
+
+`npm audit --omit=dev` 기준:
+
+| 항목 | 내용 |
+|------|------|
+| 건수 | High 1 · Moderate 1 (보고상 2 vulnerabilities) |
+| 영향 | Next.js에 포함된 `postcss` 경로 (`node_modules/next/node_modules/postcss`) |
+| 자동 권장 | `npm audit fix --force` → **Next.js 16** 메이저 설치 |
+
+**이번 작업에서 Next.js 16으로 강제 업그레이드하지 않는다.**
+호환성·회귀 위험이 커서, **별도 브랜치에서 Next 16 검증 후** 처리한다.
+운영 공개 전 **관리자 인증 보완**과 함께 해결할 항목으로 둔다.
+비밀값·계정정보는 문서에 기록하지 않는다.
+
+---
+
+## 11. 관련 문서
 
 | 문서 | 위치 |
 |------|------|
 | 문서 인덱스 | [`README.md`](README.md) |
 | 코딩 규칙 | [`CODING_RULES.md`](CODING_RULES.md) |
+| CMS·스키마 맥락 | [`AGENT_CONTEXT.md`](AGENT_CONTEXT.md) |
 | 나무말미 | `nm_dev/docs/*` |

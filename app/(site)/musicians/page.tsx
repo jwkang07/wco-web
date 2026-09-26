@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { site } from "@/lib/site";
 import Image from "next/image";
 import { PageShell } from "@/components/PageShell";
 import type { MusicianMember } from "@/lib/content";
 import { getPublishedMusicianSections } from "@/lib/public-content";
 
 export const metadata: Metadata = {
-  title: "우리단원",
+  title: { absolute: site.name },
   description:
     "악기 분야별로 우리챔버오케스트라 연주자를 소개합니다.",
   alternates: { canonical: "/musicians" },

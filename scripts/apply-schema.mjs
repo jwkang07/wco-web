@@ -1,43 +1,21 @@
 const fs = require("fs");
 const { Client } = require("pg");
 
-async function tryConnect(connectionString) {
-  const client = new Client({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-  });
-  await client.connect();
-  return client;
-}
-
 async function main() {
-  const sql = fs.readFileSync("supabase/schema.sql", "utf8");
-  const urls = [
-    process.env.DATABASE_URL,
-    "postgresql://postgres:D1NJDrdn8O4SpcRf@db.wtdvzvlizcvabziihsle.supabase.co:5432/postgres",
-    "postgresql://postgres.wtdvzvlizcvabziihsle:D1NJDrdn8O4SpcRf@aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres",
-    "postgresql://postgres.wtdvzvlizcvabziihsle:D1NJDrdn8O4SpcRf@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres",
-  ].filter(Boolean);
-
-  let client;
-  let used;
-  const errors = [];
-  for (const url of urls) {
-    try {
-      client = await tryConnect(url);
-      used = url.replace(/:[^:@/]+@/, ":****@");
-      break;
-    } catch (e) {
-      errors.push(`${url.replace(/:[^:@/]+@/, ":****@")} => ${e.message}`);
-    }
-  }
-  if (!client) {
-    console.error("CONNECT_FAILED");
-    console.error(errors.join("\n"));
+  const connectionString = process.env.SUPABASE_DB_URL;
+  if (!connectionString) {
+    console.error("SUPABASE_DB_URL is required (server-only).");
     process.exit(1);
   }
 
-  console.log("CONNECTED", used);
+  const sql = fs.readFileSync("supabase/schema.sql", "utf8");
+  const client = new Client({
+    connectionString,
+    ssl: true,
+  });
+
+  await client.connect();
+  console.log("CONNECTED");
   try {
     await client.query(sql);
     console.log("SCHEMA_OK");
@@ -61,6 +39,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  console.error(e);
+  console.error(e instanceof Error ? e.message : "failed");
   process.exit(1);
 });

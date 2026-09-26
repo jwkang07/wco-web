@@ -22,6 +22,7 @@ export const sitemapPaths = [
   "/activities/history",
   "/activities/performances",
   "/activities/press",
+  "/activities/notices",
   "/musicians",
   "/employment/intro",
   "/employment/corporate",

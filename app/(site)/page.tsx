@@ -128,11 +128,15 @@ export default async function HomePage() {
               <Link
                 key={section.name}
                 href={`/musicians#${section.name}`}
-                className={`group relative h-56 overflow-hidden rounded-2xl outline-none ring-wco-orange ring-offset-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(38,38,38,0.14)] focus-visible:ring-2 sm:h-72 ${memberVisuals[index].dark ? "text-white" : "text-wco-grey"}`}
+                className={`group relative h-56 overflow-hidden rounded-2xl outline-none ring-wco-orange ring-offset-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(38,38,38,0.14)] focus-visible:-translate-y-1 focus-visible:shadow-[0_16px_38px_rgba(38,38,38,0.14)] focus-visible:ring-2 sm:h-72 ${memberVisuals[index].dark ? "text-white" : "text-wco-grey"}`}
                 aria-label={`${section.name} 단원 보기`}
                 style={{ background: memberVisuals[index].background }}
               >
-                <span className="absolute right-5 top-5 z-10 text-xs font-black tracking-[0.14em] text-wco-orange">0{index + 1}</span>
+                <span
+                  className={`absolute right-5 top-5 z-10 text-xs font-black tracking-[0.14em] ${memberVisuals[index].dark ? "text-wco-orange" : "text-wco-orange-text"}`}
+                >
+                  0{index + 1}
+                </span>
                 <span className="absolute -right-12 -top-14 h-40 w-40 rounded-full border-[26px] border-wco-orange/[0.08] transition-transform duration-500 group-hover:scale-110" aria-hidden />
                 <div className={`absolute inset-0 transition-transform duration-500 group-hover:scale-[1.025] ${memberVisuals[index].dark ? "text-[#dbc8bb]" : "text-[#514a45]"}`} role="img" aria-label={`${section.name}를 상징하는 악기 선화`}>
                   {memberVisuals[index].artwork}

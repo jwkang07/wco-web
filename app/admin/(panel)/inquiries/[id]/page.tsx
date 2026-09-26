@@ -1,3 +1,4 @@
+import { formatSeoulDateTime } from "@/lib/format-seoul-date";
 import { adminPath } from "@/lib/admin-path";
 import { notFound } from "next/navigation";
 import { updateInquiryAction } from "@/app/admin/(panel)/content-actions";
@@ -37,7 +38,7 @@ export default async function AdminInquiryDetailPage({
             <div>
               <dt className="text-[#6B6B6B]">접수 시각</dt>
               <dd className="mt-1 font-semibold">
-                {new Date(String(row.created_at)).toLocaleString("ko-KR")}
+                {formatSeoulDateTime(String(row.created_at))}
               </dd>
             </div>
             <div>
@@ -59,7 +60,7 @@ export default async function AdminInquiryDetailPage({
             <div>
               <dt className="text-[#6B6B6B]">개인정보 동의</dt>
               <dd className="mt-1 font-semibold">
-                {new Date(String(row.privacy_agreed_at)).toLocaleString("ko-KR")}
+                {formatSeoulDateTime(String(row.privacy_agreed_at))}
               </dd>
             </div>
             <div>

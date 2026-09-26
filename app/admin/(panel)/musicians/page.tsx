@@ -1,3 +1,4 @@
+import { formatSeoulDate } from "@/lib/format-seoul-date";
 import { adminPath } from "@/lib/admin-path";
 import {
   AdminBoardListClient,
@@ -7,10 +8,7 @@ import {
 import { createServiceClient } from "@/lib/supabase/admin";
 
 function formatCreatedAt(raw: string | null | undefined) {
-  const v = String(raw ?? "").trim();
-  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (m) return `${m[1]}.${m[2]}.${m[3]}`;
-  return "-";
+  return formatSeoulDate(raw);
 }
 
 const COLUMNS: AdminBoardColumnDef[] = [
@@ -52,8 +50,6 @@ export default async function AdminMusiciansPage() {
   return (
     <AdminBoardListClient
       title="우리단원"
-      description="목록은 등록일 최신순입니다."
-      noun="단원"
       description="목록은 등록일 최신순입니다."
       noun="단원"
       items={items}

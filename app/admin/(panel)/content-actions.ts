@@ -6,7 +6,6 @@ import type { AdminFormActionState } from "@/components/admin/AdminActionForm";
 import { writeAuditLog } from "@/lib/admin-audit";
 import {
   ADMIN_LIMITS,
-  adminInvalidNumber,
   adminTooLong,
 } from "@/lib/admin-field-limits";
 import {
@@ -32,10 +31,6 @@ import { createServiceClient } from "@/lib/supabase/admin";
 
 function str(formData: FormData, key: string) {
   return String(formData.get(key) ?? "");
-}
-
-function bool(formData: FormData, key: string) {
-  return formData.get(key) === "on" || formData.get(key) === "true";
 }
 
 /** 게시/비게시 라디오 (value=true|false) */

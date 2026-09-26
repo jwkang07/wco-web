@@ -16,7 +16,7 @@ export const site = {
   founded: 2023,
   locale: "ko_KR",
   hero: {
-    image: "/images/hero/hero-main.png",
+    image: "/images/hero/hero-main.webp",
     imageAlt: "우리챔버오케스트라 정기연주회 무대 전경",
   },
   logo: {
@@ -37,7 +37,7 @@ export const site = {
 
 /** 공연·활동 사진 (`public/images/`) */
 export const siteImages = {
-  heroMain: "/images/hero/hero-main.png",
+  heroMain: "/images/hero/hero-main.webp",
   heroAbout: "/images/hero/hero-about.png",
   photoRehearsal: "/images/photos/photo-rehearsal.png",
   photoConcert: "/images/photos/photo-concert.png",

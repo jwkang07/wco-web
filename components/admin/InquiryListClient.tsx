@@ -11,6 +11,7 @@ import {
   adminEmptyListMessage,
   adminEmptyLoadFailed,
 } from "@/lib/admin-ui-messages";
+import { formatSeoulDateTime } from "@/lib/format-seoul-date";
 import { compactSearchText, matchesSearchFields } from "@/lib/search-text";
 
 export type AdminInquiryListItem = {
@@ -30,10 +31,7 @@ const statusLabel: Record<string, string> = {
 };
 
 function formatCreatedAt(raw: string) {
-  const d = new Date(raw);
-  if (Number.isNaN(d.getTime())) return "-";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  return formatSeoulDateTime(raw) || "-";
 }
 
 type StatusFilter = "all" | "received" | "in_progress" | "done";

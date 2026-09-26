@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { getPublishedHistories } from "@/lib/public-content";
-import { nav } from "@/lib/site";
+import { nav, site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "히스토리",
+  title: { absolute: site.name },
   description: "우리챔버오케스트라의 연혁과 주요 활동을 소개합니다.",
   alternates: { canonical: "/activities/history" },
 };

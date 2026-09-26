@@ -9,6 +9,7 @@ import {
   adminEmptyListMessage,
   adminEmptyLoadFailed,
 } from "@/lib/admin-ui-messages";
+import { formatSeoulDateTime } from "@/lib/format-seoul-date";
 import { compactSearchText, matchesSearchFields } from "@/lib/search-text";
 
 export type AdminAuditListItem = {
@@ -154,7 +155,7 @@ export function AuditListClient({
                         {no}
                       </td>
                       <td className="h-12 truncate px-3 whitespace-nowrap">
-                        {new Date(item.created_at).toLocaleString("ko-KR")}
+                        {formatSeoulDateTime(item.created_at)}
                       </td>
                       <td className="h-12 truncate px-3">{item.admin_username}</td>
                       <td className="h-12 truncate px-3">{item.action}</td>

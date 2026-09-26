@@ -58,13 +58,10 @@ export function isValidAdminLinkUrl(value: string) {
   return /^https?:\/\//i.test(v);
 }
 
-export const ADMIN_IMAGE_ACCEPT = ["image/jpeg", "image/png", "image/webp"] as const;
-export const ADMIN_IMAGE_MESSAGE =
-  "이미지 파일(jpg, jpeg, png, webp)만 등록 가능합니다.";
-
-export function isAllowedAdminImage(file: File) {
-  if (ADMIN_IMAGE_ACCEPT.includes(file.type as (typeof ADMIN_IMAGE_ACCEPT)[number])) {
-    return true;
-  }
-  return /\.(jpe?g|png|webp)$/i.test(file.name);
-}
+export {
+  ADMIN_IMAGE_ACCEPT,
+  ADMIN_IMAGE_MESSAGE,
+  ADMIN_IMAGE_MAX_BYTES,
+  isAllowedAdminImage,
+  validateAdminImageFile,
+} from "@/lib/admin-image";

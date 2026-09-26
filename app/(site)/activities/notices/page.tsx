@@ -9,10 +9,10 @@ import {
   paginateItems,
   parsePageParam,
 } from "@/lib/public-pagination";
-import { nav } from "@/lib/site";
+import { nav, site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "공지사항",
+  title: { absolute: site.name },
   description: "우리챔버오케스트라 공지와 안내입니다.",
   alternates: { canonical: "/activities/notices" },
 };

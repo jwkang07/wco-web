@@ -8,7 +8,12 @@ import {
   paginateItems,
   parsePageParam,
 } from "@/lib/public-pagination";
-import { nav } from "@/lib/site";
+import { nav, site } from "@/lib/site";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: { absolute: site.name },
+};
 
 const section = nav.find((item) => item.href === "/activities")!;
 const BASE = "/activities/press";

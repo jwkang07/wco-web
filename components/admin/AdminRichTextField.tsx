@@ -35,6 +35,9 @@ export function AdminRichTextField({
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
+        // StarterKit(v3)에 포함된 link/underline과 별도 확장 중복 방지
+        link: false,
+        underline: false,
       }),
       Underline,
       TextAlign.configure({

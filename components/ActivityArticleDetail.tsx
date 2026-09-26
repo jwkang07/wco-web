@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SafeHtml } from "@/components/SafeHtml";
 
@@ -9,6 +10,7 @@ export function ActivityArticleDetail({
   listHref,
   listLabel,
   imageSrc,
+  imageAlt,
   externalHref,
   imageProminent = false,
 }: {
@@ -19,10 +21,13 @@ export function ActivityArticleDetail({
   listHref: string;
   listLabel: string;
   imageSrc?: string;
+  imageAlt?: string;
   externalHref?: string;
   /** 공연 등 — 이미지를 본문보다 크게 강조 */
   imageProminent?: boolean;
 }) {
+  const figureAlt = imageAlt?.trim() || title;
+
   return (
     <article className="mx-auto w-full max-w-3xl">
       <header className="border-y border-wco-peach py-6 sm:py-7">
@@ -37,16 +42,26 @@ export function ActivityArticleDetail({
 
       <div className="space-y-6 py-8 sm:py-10">
         {imageSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imageSrc}
-            alt=""
-            className={
-              imageProminent
-                ? "aspect-[4/3] w-full rounded-xl object-cover"
-                : "mx-auto max-h-[28rem] w-full rounded-xl object-contain"
-            }
-          />
+          imageProminent ? (
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+              <Image
+                src={imageSrc}
+                alt={figureAlt}
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <Image
+              src={imageSrc}
+              alt={figureAlt}
+              width={1200}
+              height={900}
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="mx-auto max-h-[28rem] h-auto w-full rounded-xl object-contain"
+            />
+          )
         ) : null}
 
         {bodyHtml ? (

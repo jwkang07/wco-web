@@ -1,27 +1,14 @@
 "use server";
 
-import { createServiceClient } from "@/lib/supabase/admin";
+import { allowInquiryRequest, getRequestRateKey } from "@/lib/inquiry-rate-limit";
 import { isValidEmail, isValidPhone, sanitizePlainText } from "@/lib/sanitize";
+import { createServiceClient } from "@/lib/supabase/admin";
 
 export type InquiryFormState = {
   ok?: boolean;
   error?: string;
   fieldId?: string;
 };
-
-const rateBucket = new Map<string, { count: number; resetAt: number }>();
-
-function allowRequest(ip: string) {
-  const now = Date.now();
-  const current = rateBucket.get(ip);
-  if (!current || now > current.resetAt) {
-    rateBucket.set(ip, { count: 1, resetAt: now + 60_000 });
-    return true;
-  }
-  if (current.count >= 5) return false;
-  current.count += 1;
-  return true;
-}
 
 function fail(error: string, fieldId?: string): InquiryFormState {
   return { error, fieldId };
@@ -64,8 +51,10 @@ export async function submitInquiryAction(
     return fail("개인정보 수집·이용에 동의해 주세요.", "field-privacy");
   }
 
-  const ip = "form";
-  if (!allowRequest(ip)) return fail("잠시 후 다시 시도해 주세요.");
+  const rateKey = await getRequestRateKey();
+  if (!(await allowInquiryRequest(rateKey))) {
+    return fail("잠시 후 다시 시도해 주세요.");
+  }
 
   try {
     const sb = createServiceClient();

@@ -24,8 +24,12 @@
 
 | 문서 | 내용 |
 |------|------|
+| [`../AGENTS.md`](../AGENTS.md) | AI 에이전트 공통 진입점 (Cursor / Codex / Antigravity) |
+| [`AGENT_CONTEXT.md`](AGENT_CONTEXT.md) | **CMS·스키마·메뉴 최신 결정** (도구 간 공유 맥락) |
 | [`CODING_RULES.md`](CODING_RULES.md) | 코딩·폴더·공개/관리자 경계 |
 | [`DEVELOPMENT.md`](DEVELOPMENT.md) | 스택·배포·SEO·폼 기능 참고 |
+
+Antigravity 규칙 미러: [`.agents/rules/`](../.agents/rules/)
 
 ## 참고 (나무말미)
 

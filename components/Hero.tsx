@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /** 모든 페이지 메인 비주얼 영역의 동일한 세로 높이 */
@@ -25,6 +26,9 @@ export function Hero({
   imageAlt = "",
   mainVisual = false,
 }: HeroProps) {
+  const altText = imageAlt.trim();
+  const imageIsDecorative = !altText;
+
   return (
     <section
       className={`relative shrink-0 overflow-hidden bg-wco-grey text-white ${mainVisual ? MAIN_HERO_HEIGHT_CLASS : HERO_HEIGHT_CLASS}`}
@@ -32,15 +36,21 @@ export function Hero({
       {imageSrc ? (
         <>
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${imageSrc})`,
-            }}
-            role="img"
-            aria-label={imageAlt}
-          />
+            className="absolute inset-0 z-0"
+            aria-hidden={imageIsDecorative ? true : undefined}
+          >
+            <Image
+              src={imageSrc}
+              alt={imageIsDecorative ? "" : altText}
+              fill
+              sizes="100vw"
+              priority
+              fetchPriority="high"
+              className="object-cover object-[center_35%] sm:object-[center_40%] lg:object-center"
+            />
+          </div>
           <div
-            className={`absolute inset-0 bg-gradient-to-r ${
+            className={`absolute inset-0 z-10 bg-gradient-to-r ${
               mainVisual
                 ? "from-wco-grey/65 via-wco-grey/40 to-wco-grey/15"
                 : "from-wco-grey/72 via-wco-grey/52 to-wco-grey/28"
@@ -50,7 +60,7 @@ export function Hero({
         </>
       ) : null}
 
-      <div className="container relative h-full">
+      <div className="container relative z-20 h-full">
         <div className="flex h-full flex-col pt-10 sm:pt-12 lg:pt-14">
           <h1 className="line-clamp-2 min-h-[2.75rem] shrink-0 font-serif text-3xl font-bold leading-tight tracking-tight sm:min-h-[3.5rem] sm:text-4xl lg:min-h-[4.5rem] lg:text-5xl">
             {titleLines ? (

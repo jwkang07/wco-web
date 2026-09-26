@@ -5,7 +5,7 @@ import { PageShell } from "@/components/PageShell";
 import { nav, site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "오케스트라 소개",
+  title: { absolute: site.name },
   description:
     "우리챔버오케스트라는 은평구립우리장애인복지관 기업연계형 일자리로, 발달장애 연주자가 협연으로 성장하는 오케스트라입니다.",
   alternates: { canonical: "/about/intro" },
@@ -42,11 +42,10 @@ export default function AboutIntroPage() {
         <div className="container grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
           <div className="relative overflow-hidden rounded-3xl bg-neutral-100 shadow-[0_20px_50px_rgba(0,0,0,0.12)]">
             <Image
-              src="/images/hero/hero-main.png"
+              src="/images/hero/hero-main.webp"
               alt="우리챔버오케스트라 연주회 무대 전경"
               width={1200}
               height={750}
-              priority
               className="aspect-[4/3] w-full object-cover"
             />
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-6 pb-6 pt-20 text-white">

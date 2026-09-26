@@ -1,0 +1,16 @@
+---
+description: WCO CMS·스키마·메뉴 최신 결정 — 보드형 공연/보도/공지, 미사용 컬럼
+globs: app/**/*.{ts,tsx}, components/**/*.{ts,tsx}, lib/**/*.ts, supabase/**/*
+alwaysApply: true
+---
+
+# WCO CMS · 스키마
+
+상세: `docs/AGENT_CONTEXT.md`, 루트 `AGENTS.md`
+
+- 공연·보도·공지: TipTap `body_html`, pin / home(≤5) / views. 정렬은 pin+`created_at` (sort_order 아님)
+- 보도 `href`(원문링크) 없음 — 상세 URL + 본문 링크
+- 히스토리만 `sort_order` ▲▼
+- 히어로: 게시=`is_published`만. `image_alt` 유지. `is_selected` 폐기
+- 홈: 공지|보도 2열 동일 평면
+- CMS/스키마 변경 시 `docs/AGENT_CONTEXT.md`도 갱신

@@ -1,6 +1,8 @@
 /node_modules
 /.next/
 /.next-dev/
+/.next-verify-build/
+/.next-prod-verify/
 /out/
 /build
 .DS_Store
@@ -11,6 +13,11 @@
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# Local scratch / one-off artifacts (keep on disk; do not commit)
+/.tmp/
+.tmp-*
+/.docx-work/
 
 # Supabase CLI local cache
 supabase/.temp/

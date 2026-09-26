@@ -1,3 +1,4 @@
+import { formatSeoulDate } from "@/lib/format-seoul-date";
 import { notFound } from "next/navigation";
 import {
   HeroSectionListClient,
@@ -40,7 +41,7 @@ export default async function AdminHeroSectionListPage({
         isSelected: Boolean(row.is_selected),
         isPublished: row.is_published !== false,
         updatedAt: row.created_at
-          ? new Date(String(row.created_at)).toLocaleDateString("ko-KR")
+          ? formatSeoulDate(String(row.created_at))
           : "-",
       };
     });

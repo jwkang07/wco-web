@@ -1,35 +1,21 @@
 const fs = require("fs");
 const { Client } = require("pg");
 
-async function tryConnect(connectionString) {
+async function main() {
+  const connectionString = process.env.SUPABASE_DB_URL;
+  if (!connectionString) {
+    console.error("SUPABASE_DB_URL is required (server-only).");
+    process.exit(1);
+  }
+
+  const sql = fs.readFileSync("supabase/alter-page-heroes-multi.sql", "utf8");
   const client = new Client({
     connectionString,
-    ssl: { rejectUnauthorized: false },
+    ssl: true,
   });
+
   await client.connect();
-  return client;
-}
-
-async function main() {
-  const sql = fs.readFileSync("supabase/alter-page-heroes-multi.sql", "utf8");
-  const urls = [
-    process.env.DATABASE_URL,
-    "postgresql://postgres:D1NJDrdn8O4SpcRf@db.wtdvzvlizcvabziihsle.supabase.co:5432/postgres",
-    "postgresql://postgres.wtdvzvlizcvabziihsle:D1NJDrdn8O4SpcRf@aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres",
-  ].filter(Boolean);
-
-  let client;
-  for (const url of urls) {
-    try {
-      client = await tryConnect(url);
-      console.log("CONNECTED");
-      break;
-    } catch (e) {
-      console.log("fail", e.message);
-    }
-  }
-  if (!client) process.exit(1);
-
+  console.log("CONNECTED");
   try {
     await client.query(sql);
     console.log("ALTER_OK");
@@ -46,6 +32,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  console.error(e);
+  console.error(e instanceof Error ? e.message : "failed");
   process.exit(1);
 });

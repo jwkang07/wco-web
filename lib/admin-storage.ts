@@ -1,3 +1,4 @@
+import { validateAdminImageFile } from "@/lib/admin-image";
 import { createServiceClient, getSupabasePublicUrl } from "@/lib/supabase/admin";
 
 const ADMIN_IMAGE_BUCKETS = ["heroes", "performances", "musicians"] as const;
@@ -8,13 +9,15 @@ export async function uploadAdminImage(opts: {
   file: File;
   prefix: string;
 }) {
+  const validated = await validateAdminImageFile(opts.file);
+  if ("error" in validated) {
+    throw new Error(validated.error);
+  }
+
   const sb = createServiceClient();
-  const ext = opts.file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const safeExt = ["jpg", "jpeg", "png", "webp"].includes(ext) ? ext : "jpg";
-  const key = `${opts.prefix}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
-  const buffer = Buffer.from(await opts.file.arrayBuffer());
-  const { error } = await sb.storage.from(opts.bucket).upload(key, buffer, {
-    contentType: opts.file.type || `image/${safeExt}`,
+  const key = `${opts.prefix}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${validated.ext}`;
+  const { error } = await sb.storage.from(opts.bucket).upload(key, validated.buffer, {
+    contentType: validated.contentType,
     upsert: false,
   });
   if (error) throw new Error(error.message);
