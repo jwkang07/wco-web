@@ -11,6 +11,15 @@ const PORT = Number(process.env.PLAYWRIGHT_PORT || 3100);
 const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL?.trim();
 const baseURL = externalBaseURL || `http://localhost:${PORT}`;
 
+/**
+ * 테스트 서버 전용 관리자 계정 — Playwright가 띄우는 서버에만 주입(.env.local 값보다 우선).
+ * 운영 계정과 무관. PLAYWRIGHT_BASE_URL 로 외부 서버를 검사할 때는 E2E_ADMIN_* 를 직접 줘야 로그인 테스트가 돈다.
+ */
+if (!externalBaseURL) {
+  process.env.E2E_ADMIN_USERNAME ||= "e2e-admin";
+  process.env.E2E_ADMIN_PASSWORD ||= "e2e-local-test-only";
+}
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -33,6 +42,11 @@ export default defineConfig({
           ? `npm run start -- -p ${PORT}`
           : `npm run build && npm run start -- -p ${PORT}`,
         url: baseURL,
+        env: {
+          ADMIN_USERNAME: process.env.E2E_ADMIN_USERNAME!,
+          ADMIN_PASSWORD: process.env.E2E_ADMIN_PASSWORD!,
+          ADMIN_SESSION_SECRET: "e2e-session-secret-local-only",
+        },
         reuseExistingServer: !process.env.CI,
         timeout: 300_000,
       },

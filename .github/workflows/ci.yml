@@ -27,6 +27,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # 배포물(운영 의존성) 취약점만 차단. eslint 등 개발 도구 쪽은 Dependabot PR로 따라감
+      - run: npm audit --omit=dev --audit-level=moderate
       - run: npm run lint
       - run: npm run build
       # 스모크 E2E — Supabase 서버 시크릿 없이 정적 폴백으로 실행(상세 진입·로그인 테스트는 skip)
