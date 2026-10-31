@@ -28,7 +28,10 @@ export default defineConfig({
   webServer: externalBaseURL
     ? undefined
     : {
-        command: `npm run build && npm run start -- -p ${PORT}`,
+        // CI는 직전 단계에서 build 하므로 start만
+        command: process.env.CI
+          ? `npm run start -- -p ${PORT}`
+          : `npm run build && npm run start -- -p ${PORT}`,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 300_000,

@@ -10,9 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-build:
+  lint-build-e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       # 빌드 시 번들에 들어가는 공개 값만. 미설정이어도 빌드는 통과(앱이 정적 폴백).
       # SUPABASE_SERVICE_ROLE_KEY 등 서버 시크릿은 CI에 넣지 않는다.
@@ -29,3 +29,14 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+      # 스모크 E2E — Supabase 서버 시크릿 없이 정적 폴백으로 실행(상세 진입·로그인 테스트는 skip)
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
