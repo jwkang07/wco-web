@@ -226,6 +226,16 @@ npm run test:e2e                  # build → next start(:3100) → 테스트
 - 로그인 테스트는 `E2E_ADMIN_USERNAME` / `E2E_ADMIN_PASSWORD` env를 줄 때만 실행(테스트 전용 계정 권장).
 - 이미 켜 둔 서버를 검사하려면 `PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run test:e2e`.
 
+### 오류 모니터링 (Sentry)
+
+`@sentry/nextjs` — `instrumentation.ts`(서버·엣지, Server Action 오류 포함), `instrumentation-client.ts`(브라우저), `app/global-error.tsx`, `next.config.ts`의 `withSentryConfig`.
+DSN이 없으면 아무것도 전송하지 않는다(로컬·CI 기본).
+
+| 환경변수 (Vercel에 등록) | 필수 | 용도 |
+|--------------------------|------|------|
+| `NEXT_PUBLIC_SENTRY_DSN` | ✔ | 기존 Sentry 계정의 wco_web 프로젝트 DSN |
+| `SENTRY_AUTH_TOKEN` · `SENTRY_ORG` · `SENTRY_PROJECT` | 선택 | 빌드 시 소스맵 업로드(오류 위치를 원본 코드 줄로 표시). 없으면 업로드 생략 |
+
 ---
 
 ## 12. 관련 문서
