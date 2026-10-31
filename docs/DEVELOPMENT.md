@@ -197,7 +197,38 @@ wco_web/
 
 ---
 
-## 11. 관련 문서
+## 11. CI · 스모크 E2E
+
+### CI (`.github/workflows/ci.yml`)
+
+`main` push · 모든 PR에서 `npm ci` → `npm run lint` → `npm run build`.
+
+GitHub → Settings → Secrets and variables → Actions 에 아래 **이름**으로 등록(값은 Vercel과 동일, 문서에 기록 금지). 미등록이어도 빌드는 통과한다(앱이 정적 폴백).
+
+| Secret 이름 | 용도 |
+|-------------|------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase 공개 URL |
+| `NEXT_PUBLIC_ADMIN_BASE_PATH` | 관리자 공개 경로 |
+| `NEXT_PUBLIC_SITE_URL` | canonical origin (커스텀 도메인 연결 시) |
+
+`SUPABASE_SERVICE_ROLE_KEY`·`ADMIN_*` 등 서버 시크릿은 CI에 넣지 않는다.
+
+### 스모크 E2E (Playwright)
+
+```bash
+npx playwright install chromium   # 최초 1회
+npm run test:e2e                  # build → next start(:3100) → 테스트
+```
+
+- `e2e/public.spec.ts`: 홈, 공지·보도·공연 목록 → 첫 글 상세
+- `e2e/admin.spec.ts`: 로그인 화면, 비로그인 리다이렉트, (선택) 로그인 후 공지 목록
+- `.env.local`이 없으면 정적 폴백으로 돌고 **상세 진입은 skip**. 있으면 연결된 DB를 읽고, 상세 진입마다 해당 글 `view_count`가 +1 된다.
+- 로그인 테스트는 `E2E_ADMIN_USERNAME` / `E2E_ADMIN_PASSWORD` env를 줄 때만 실행(테스트 전용 계정 권장).
+- 이미 켜 둔 서버를 검사하려면 `PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run test:e2e`.
+
+---
+
+## 12. 관련 문서
 
 | 문서 | 위치 |
 |------|------|
