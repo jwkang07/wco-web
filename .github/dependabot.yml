@@ -1,0 +1,32 @@
+version: 2
+updates:
+  # npm 의존성 — 보안 패치·마이너 업데이트를 묶어서 주 1회 PR (CI 통과 확인 후 머지)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 5
+    groups:
+      lint-tooling:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "@typescript-eslint/*"
+          - "typescript-eslint"
+        update-types: [minor, patch]
+      runtime:
+        patterns: ["*"]
+        exclude-patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "@typescript-eslint/*"
+          - "typescript-eslint"
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

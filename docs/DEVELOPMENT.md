@@ -223,8 +223,16 @@ npm run test:e2e                  # build → next start(:3100) → 테스트
 - `e2e/public.spec.ts`: 홈, 공지·보도·공연 목록 → 첫 글 상세
 - `e2e/admin.spec.ts`: 로그인 화면, 비로그인 리다이렉트, (선택) 로그인 후 공지 목록
 - `.env.local`이 없으면 정적 폴백으로 돌고 **상세 진입은 skip**. 있으면 연결된 DB를 읽고, 상세 진입마다 해당 글 `view_count`가 +1 된다.
-- 로그인 테스트는 `E2E_ADMIN_USERNAME` / `E2E_ADMIN_PASSWORD` env를 줄 때만 실행(테스트 전용 계정 권장).
-- 이미 켜 둔 서버를 검사하려면 `PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run test:e2e`.
+- 로그인 테스트: `playwright.config.ts`가 테스트 서버에만 전용 계정(`e2e-admin`)을 주입한다. 운영 계정과 무관. DB 연결 상태면 `admin_audit_logs`에 로그인 1건이 기록된다.
+- 이미 켜 둔 서버를 검사하려면 `PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run test:e2e` (이때 로그인 테스트는 `E2E_ADMIN_USERNAME`/`E2E_ADMIN_PASSWORD`를 직접 줘야 실행).
+- Windows PowerShell에서 `npm` 실행이 막히면 `npm.cmd run test:e2e`.
+
+### 의존성 취약점 정책
+
+- CI는 `npm audit --omit=dev --audit-level=moderate` — **배포물(운영 의존성)** 취약점이 있으면 실패.
+- 개발 도구(eslint 플러그인의 `minimatch@3`) moderate 경고는 상위 패키지가 고칠 때까지 남는다. 배포물에 포함되지 않음.
+- `.github/dependabot.yml`: 매주 월요일 09:00(KST) 업데이트 PR 자동 생성 → CI 통과 확인 후 머지.
+- `package.json` `overrides`: Sentry 빌드 플러그인 `glob`, eslint 계열 `minimatch@10`→`11` 강제. 상위 패키지가 따라오면 제거 가능.
 
 ### 오류 모니터링 (Sentry)
 
