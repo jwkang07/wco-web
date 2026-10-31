@@ -34,7 +34,7 @@ jobs:
       # 스모크 E2E — Supabase 서버 시크릿 없이 정적 폴백으로 실행(상세 진입·로그인 테스트는 skip)
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
